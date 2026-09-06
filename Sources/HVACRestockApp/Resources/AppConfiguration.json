@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0.0",
+  "appId": "hvac-restock-ios",
+  "displayName": "HVAC Restock",
+  "bundleIdPlaceholder": "com.worksbienstudios.hvacrestock",
+  "minimumOS": "17.0",
+  "shell": {
+    "family": "GoodUse SwiftUI",
+    "source": "approved Kitchen Prep Board SwiftUI shell",
+    "appSpecificCodeOutsideShell": true
+  },
+  "storage": "SwiftData device-local",
+  "accounts": false,
+  "cloud": false,
+  "analytics": false,
+  "advertising": false,
+  "images": false,
+  "monetization": {
+    "type": "one_time_non_consumable",
+    "referencePriceUSD": 14.99,
+    "freeActiveItemLimit": 10,
+    "productId": "com.worksbienstudios.hvacrestock.lifetime"
+  },
+  "exports": ["inventory_csv", "restock_csv", "activity_csv"]
+}
