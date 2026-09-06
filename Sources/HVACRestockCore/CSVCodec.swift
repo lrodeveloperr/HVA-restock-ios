@@ -168,7 +168,10 @@ public enum InventoryCSVCodec {
         var row: [String] = []
         var field = ""
         var insideQuotes = false
-        let characters = Array(input)
+        let normalizedInput = input
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+        let characters = Array(normalizedInput)
         var index = 0
         var currentLine = 1
         var rowStartLine = 1
