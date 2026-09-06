@@ -44,6 +44,7 @@ targets:
       - AppHost/PrivacyInfo.xcprivacy
     dependencies:
       - target: HVACRestockApp
+      - target: HVACRestockCore
     settings:
       base:
         PRODUCT_NAME: HVAC Restock
