@@ -2,7 +2,7 @@
 set -euo pipefail
 
 project_dir="$(cd "$(dirname "$0")/.." && pwd)"
-preview_file="$(cd "$project_dir/.." && pwd)/HVAC-Restock-iOS-Full-Preview.html"
+preview_file="$project_dir/HVAC-Restock-iOS-Full-Preview.html"
 node_bin="${CODEX_PRIMARY_RUNTIME_NODE:-node}"
 
 jq -e . "$project_dir/Sources/HVACRestockApp/Resources/AppConfiguration.json" >/dev/null
