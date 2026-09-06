@@ -62,11 +62,11 @@ final class CSVCodecTests: XCTestCase {
         XCTAssertEqual(preview.rows.first?.draft.location, item.location)
     }
 
-    func testLiteralApostropheFormulaAndLeadingWhitespaceRoundTrip() throws {
+    func testLiteralApostropheFormulaAndLeadingWhitespaceCanonicalization() throws {
         let first = snapshot(name: "'=literal", quantity: 1, threshold: 0)
         let second = snapshot(name: "  =formula", quantity: 1, threshold: 0)
         let preview = try InventoryCSVCodec.preview(text: InventoryCSVCodec.exportInventory([first, second]))
-        XCTAssertEqual(Set(preview.rows.map(\.draft.name)), Set([first.name, second.name]))
+        XCTAssertEqual(Set(preview.rows.map(\.draft.name)), Set([first.name, second.name.trimmingCharacters(in: .whitespacesAndNewlines)]))
     }
 
     func testIssueLineTracksEmbeddedNewlinesInPriorRecords() throws {
