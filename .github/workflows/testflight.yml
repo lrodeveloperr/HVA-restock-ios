@@ -7,6 +7,23 @@ on:
         description: Type UPLOAD HVAC RESTOCK to confirm production-logic upload
         required: true
         type: string
+  workflow_call:
+    inputs:
+      confirmation:
+        description: Exact protected upload confirmation
+        required: true
+        type: string
+    secrets:
+      ASC_KEY_ID:
+        required: true
+      ASC_ISSUER_ID:
+        required: true
+      ASC_PRIVATE_KEY:
+        required: true
+      IOS_DISTRIBUTION_CERTIFICATE_P12:
+        required: true
+      IOS_DISTRIBUTION_CERTIFICATE_PASSWORD:
+        required: true
 
 permissions:
   contents: read
@@ -31,6 +48,9 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
+        with:
+          repository: lrodeveloperr/HVA-restock-ios
+          ref: main
       - name: Confirm production upload
         env:
           CONFIRMATION: ${{ inputs.confirmation }}
@@ -72,7 +92,7 @@ jobs:
           printf '%s' "$ASC_PRIVATE_KEY" > "$key_path"
           chmod 600 "$key_path"
           echo "ASC_KEY_PATH=$key_path" >> "$GITHUB_ENV"
-      - name: Verify App Store record
+      - name: Ensure Apple bundle ID and App Store record
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
           ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -80,10 +100,29 @@ jobs:
           jwt="$(ruby Scripts/app-store-connect-jwt.rb "$ASC_KEY_PATH" "$ASC_KEY_ID" "$ASC_ISSUER_ID")"
           echo "ASC_JWT=$jwt" >> "$GITHUB_ENV"
           auth="Authorization: Bearer $jwt"
-          curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode "filter[identifier]=$IOS_BUNDLE_ID" --data-urlencode 'limit=2' 'https://api.appstoreconnect.apple.com/v1/bundleIds' -o "$RUNNER_TEMP/bundle.json"
-          [[ "$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV[0])).fetch("data").length' "$RUNNER_TEMP/bundle.json")" == "1" ]] || { echo "Expected one registered bundle ID: $IOS_BUNDLE_ID" >&2; exit 1; }
-          curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode "filter[bundleId]=$IOS_BUNDLE_ID" --data-urlencode 'limit=2' 'https://api.appstoreconnect.apple.com/v1/apps' -o "$RUNNER_TEMP/app.json"
-          [[ "$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV[0])).fetch("data").length' "$RUNNER_TEMP/app.json")" == "1" ]] || { echo "Expected one App Store record for $IOS_BUNDLE_ID" >&2; exit 1; }
+          bundle_json="$RUNNER_TEMP/bundle.json"
+          curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode "filter[identifier]=$IOS_BUNDLE_ID" --data-urlencode 'limit=2' 'https://api.appstoreconnect.apple.com/v1/bundleIds' -o "$bundle_json"
+          count="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV[0])).fetch("data").length' "$bundle_json")"
+          if [[ "$count" == "0" ]]; then
+            ruby -rjson -e 'puts JSON.generate(data:{type:"bundleIds",attributes:{identifier:ENV.fetch("IOS_BUNDLE_ID"),name:ENV.fetch("APP_NAME"),platform:"IOS"}})' > "$RUNNER_TEMP/create-bundle.json"
+            curl --fail-with-body --silent --show-error -X POST -H "$auth" -H 'Content-Type: application/json' -d @"$RUNNER_TEMP/create-bundle.json" 'https://api.appstoreconnect.apple.com/v1/bundleIds' -o "$bundle_json"
+          elif [[ "$count" != "1" ]]; then
+            echo "Bundle ID lookup was ambiguous." >&2
+            exit 1
+          fi
+          bundle_resource_id="$(ruby -rjson -e 'd=JSON.parse(File.read(ARGV[0])).fetch("data"); d=d.fetch(0) if d.is_a?(Array); puts d.fetch("id")' "$bundle_json")"
+          echo "BUNDLE_RESOURCE_ID=$bundle_resource_id" >> "$GITHUB_ENV"
+
+          app_json="$RUNNER_TEMP/app.json"
+          curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode "filter[bundleId]=$IOS_BUNDLE_ID" --data-urlencode 'limit=2' 'https://api.appstoreconnect.apple.com/v1/apps' -o "$app_json"
+          app_count="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV[0])).fetch("data").length' "$app_json")"
+          if [[ "$app_count" == "0" ]]; then
+            ruby -rjson -e 'puts JSON.generate(data:{type:"apps",attributes:{bundleId:ENV.fetch("IOS_BUNDLE_ID"),name:ENV.fetch("APP_NAME"),primaryLocale:"en-US",sku:ENV.fetch("APP_SKU")}})' > "$RUNNER_TEMP/create-app.json"
+            curl --fail-with-body --silent --show-error -X POST -H "$auth" -H 'Content-Type: application/json' -d @"$RUNNER_TEMP/create-app.json" 'https://api.appstoreconnect.apple.com/v1/apps' -o "$app_json"
+          elif [[ "$app_count" != "1" ]]; then
+            echo "App lookup was ambiguous." >&2
+            exit 1
+          fi
       - name: Install distribution signing assets
         env:
           IOS_DISTRIBUTION_CERTIFICATE_P12: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_P12 }}
@@ -104,8 +143,19 @@ jobs:
           security list-keychains -d user -s "$keychain_path" $(security list-keychains -d user | tr -d '"')
           security find-identity -v -p codesigning "$keychain_path" | grep 'Apple Distribution'
           profile_json="$RUNNER_TEMP/profiles.json"
-          curl --fail-with-body --silent --show-error --get -H "Authorization: Bearer $ASC_JWT" --data-urlencode "filter[name]=$PROVISIONING_PROFILE_NAME" --data-urlencode 'filter[profileState]=ACTIVE' --data-urlencode 'limit=2' 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
-          [[ "$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV[0])).fetch("data").length' "$profile_json")" == "1" ]] || { echo "Expected one active provisioning profile named $PROVISIONING_PROFILE_NAME." >&2; exit 1; }
+          auth="Authorization: Bearer $ASC_JWT"
+          curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode "filter[name]=$PROVISIONING_PROFILE_NAME" --data-urlencode 'filter[profileState]=ACTIVE' --data-urlencode 'limit=2' 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
+          profile_count="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV[0])).fetch("data").length' "$profile_json")"
+          if [[ "$profile_count" == "0" ]]; then
+            cert_json="$RUNNER_TEMP/certificates.json"
+            curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode 'limit=200' 'https://api.appstoreconnect.apple.com/v1/certificates' -o "$cert_json"
+            certificate_id="$(ruby -rjson -rtime -e 'data=JSON.parse(File.read(ARGV[0])).fetch("data"); cert=data.select{|x| %w[DISTRIBUTION IOS_DISTRIBUTION].include?(x.dig("attributes","certificateType")) && Time.parse(x.dig("attributes","expirationDate")) > Time.now}.max_by{|x| Time.parse(x.dig("attributes","expirationDate"))}; abort "No active iOS distribution certificate in Apple account" unless cert; puts cert.fetch("id")' "$cert_json")"
+            BUNDLE_RESOURCE_ID="$BUNDLE_RESOURCE_ID" CERTIFICATE_ID="$certificate_id" ruby -rjson -e 'puts JSON.generate(data:{type:"profiles",attributes:{name:ENV.fetch("PROVISIONING_PROFILE_NAME"),profileType:"IOS_APP_STORE"},relationships:{bundleId:{data:{type:"bundleIds",id:ENV.fetch("BUNDLE_RESOURCE_ID")}},certificates:{data:[{type:"certificates",id:ENV.fetch("CERTIFICATE_ID")}]}}})' > "$RUNNER_TEMP/create-profile.json"
+            curl --fail-with-body --silent --show-error -X POST -H "$auth" -H 'Content-Type: application/json' -d @"$RUNNER_TEMP/create-profile.json" 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
+          elif [[ "$profile_count" != "1" ]]; then
+            echo "Provisioning profile lookup was ambiguous." >&2
+            exit 1
+          fi
           profile_path="$RUNNER_TEMP/app-store.mobileprovision"
           ruby -rjson -rbase64 -e 'doc=JSON.parse(File.read(ARGV[0])); print Base64.decode64(doc.fetch("data").fetch(0).fetch("attributes").fetch("profileContent"))' "$profile_json" > "$profile_path"
           security cms -D -i "$profile_path" > "$RUNNER_TEMP/profile.plist"
