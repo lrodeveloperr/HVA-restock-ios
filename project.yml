@@ -36,13 +36,7 @@ targets:
     sources:
       - path: AppHost
         excludes:
-          - Assets.xcassets
           - Info.plist
-          - PrivacyInfo.xcprivacy
-    resources:
-      - AppHost/Assets.xcassets
-      - AppHost/RawAppIcons
-      - AppHost/PrivacyInfo.xcprivacy
     dependencies:
       - target: HVACRestockApp
       - target: HVACRestockCore
