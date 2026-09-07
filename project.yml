@@ -41,6 +41,7 @@ targets:
           - PrivacyInfo.xcprivacy
     resources:
       - AppHost/Assets.xcassets
+      - AppHost/RawAppIcons
       - AppHost/PrivacyInfo.xcprivacy
     dependencies:
       - target: HVACRestockApp
