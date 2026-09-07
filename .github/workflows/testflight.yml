@@ -37,7 +37,7 @@ env:
   APPLE_TEAM_ID: 49SQ3XQ68Q
   APP_NAME: HVAC Restock
   APP_SKU: hvac-restock-ios
-  PROVISIONING_PROFILE_NAME: HVAC Restock App Store CI
+  PROVISIONING_PROFILE_NAME: HVAC Restock App Store CI 2026-09-07
   SCHEME: HVACRestock
   ARCHIVE_PATH: ${{ github.workspace }}/build/HVACRestock.xcarchive
   EXPORT_PATH: ${{ github.workspace }}/build/export
