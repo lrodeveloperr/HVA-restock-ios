@@ -20,10 +20,6 @@ on:
         required: true
       ASC_PRIVATE_KEY:
         required: true
-      IOS_DISTRIBUTION_CERTIFICATE_P12:
-        required: true
-      IOS_DISTRIBUTION_CERTIFICATE_PASSWORD:
-        required: true
 
 permissions:
   contents: read
@@ -122,65 +118,51 @@ jobs:
             echo "App lookup was ambiguous." >&2
             exit 1
           fi
-      - name: Install distribution signing assets
+      - name: Archive App Store build for cloud signing
         env:
-          IOS_DISTRIBUTION_CERTIFICATE_P12: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_P12 }}
-          IOS_DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.IOS_DISTRIBUTION_CERTIFICATE_PASSWORD }}
-        run: |
-          [[ -n "$IOS_DISTRIBUTION_CERTIFICATE_P12" ]] || { echo 'Missing IOS_DISTRIBUTION_CERTIFICATE_P12.' >&2; exit 1; }
-          [[ -n "$IOS_DISTRIBUTION_CERTIFICATE_PASSWORD" ]] || { echo 'Missing IOS_DISTRIBUTION_CERTIFICATE_PASSWORD.' >&2; exit 1; }
-          cert_path="$RUNNER_TEMP/distribution.p12"
-          printf '%s' "$IOS_DISTRIBUTION_CERTIFICATE_P12" | base64 --decode > "$cert_path"
-          chmod 600 "$cert_path"
-          keychain_path="$RUNNER_TEMP/app-signing.keychain-db"
-          keychain_password="$(openssl rand -hex 24)"
-          security create-keychain -p "$keychain_password" "$keychain_path"
-          security set-keychain-settings -lut 21600 "$keychain_path"
-          security unlock-keychain -p "$keychain_password" "$keychain_path"
-          security import "$cert_path" -P "$IOS_DISTRIBUTION_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k "$keychain_path"
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain_path"
-          security list-keychains -d user -s "$keychain_path" $(security list-keychains -d user | tr -d '"')
-          security find-identity -v -p codesigning "$keychain_path" | grep 'Apple Distribution'
-          profile_json="$RUNNER_TEMP/profiles.json"
-          auth="Authorization: Bearer $ASC_JWT"
-          curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode "filter[name]=$PROVISIONING_PROFILE_NAME" --data-urlencode 'filter[profileState]=ACTIVE' --data-urlencode 'limit=2' 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
-          profile_count="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV[0])).fetch("data").length' "$profile_json")"
-          if [[ "$profile_count" == "0" ]]; then
-            cert_json="$RUNNER_TEMP/certificates.json"
-            curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode 'limit=200' 'https://api.appstoreconnect.apple.com/v1/certificates' -o "$cert_json"
-            certificate_id="$(ruby -rjson -rtime -e 'data=JSON.parse(File.read(ARGV[0])).fetch("data"); cert=data.select{|x| %w[DISTRIBUTION IOS_DISTRIBUTION].include?(x.dig("attributes","certificateType")) && Time.parse(x.dig("attributes","expirationDate")) > Time.now}.max_by{|x| Time.parse(x.dig("attributes","expirationDate"))}; abort "No active iOS distribution certificate in Apple account" unless cert; puts cert.fetch("id")' "$cert_json")"
-            BUNDLE_RESOURCE_ID="$BUNDLE_RESOURCE_ID" CERTIFICATE_ID="$certificate_id" ruby -rjson -e 'puts JSON.generate(data:{type:"profiles",attributes:{name:ENV.fetch("PROVISIONING_PROFILE_NAME"),profileType:"IOS_APP_STORE"},relationships:{bundleId:{data:{type:"bundleIds",id:ENV.fetch("BUNDLE_RESOURCE_ID")}},certificates:{data:[{type:"certificates",id:ENV.fetch("CERTIFICATE_ID")}]}}})' > "$RUNNER_TEMP/create-profile.json"
-            curl --fail-with-body --silent --show-error -X POST -H "$auth" -H 'Content-Type: application/json' -d @"$RUNNER_TEMP/create-profile.json" 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
-          elif [[ "$profile_count" != "1" ]]; then
-            echo "Provisioning profile lookup was ambiguous." >&2
-            exit 1
-          fi
-          profile_path="$RUNNER_TEMP/app-store.mobileprovision"
-          ruby -rjson -rbase64 -e 'doc=JSON.parse(File.read(ARGV[0])); print Base64.decode64(doc.fetch("data").fetch(0).fetch("attributes").fetch("profileContent"))' "$profile_json" > "$profile_path"
-          security cms -D -i "$profile_path" > "$RUNNER_TEMP/profile.plist"
-          profile_uuid="$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profile.plist")"
-          app_identifier="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$RUNNER_TEMP/profile.plist")"
-          [[ "$app_identifier" == "$APPLE_TEAM_ID.$IOS_BUNDLE_ID" ]]
-          mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
-          cp "$profile_path" "$HOME/Library/MobileDevice/Provisioning Profiles/$profile_uuid.mobileprovision"
-          echo "SIGNING_KEYCHAIN=$keychain_path" >> "$GITHUB_ENV"
-      - name: Archive and export signed IPA
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
         run: |
           rm -rf "$ARCHIVE_PATH" "$EXPORT_PATH"
           mkdir -p "$(dirname "$ARCHIVE_PATH")" "$EXPORT_PATH"
-          xcodebuild -project HVACRestock.xcodeproj -scheme "$SCHEME" -configuration Release -destination 'generic/platform=iOS' -archivePath "$ARCHIVE_PATH" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$IOS_BUNDLE_ID" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" clean archive
+          xcodebuild -project HVACRestock.xcodeproj -scheme "$SCHEME" -configuration Release -destination 'generic/platform=iOS' -archivePath "$ARCHIVE_PATH" -allowProvisioningUpdates -authenticationKeyPath "$ASC_KEY_PATH" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$IOS_BUNDLE_ID" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" clean archive
+
+      - name: Stage archive for Apple distribution signing
+        run: |
+          app="$(find "$ARCHIVE_PATH/Products/Applications" -maxdepth 1 -type d -name '*.app' -print -quit)"
+          test -n "$app"
+          [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")" == "$IOS_BUNDLE_ID" ]]
+          [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$app/Info.plist")" == "$BUILD_NUMBER" ]]
+          [[ -f "$app/PrivacyInfo.xcprivacy" ]]
+          staged_entitlements="$RUNNER_TEMP/HVACRestock-staged-entitlements.plist"
+          cat > "$staged_entitlements" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>application-identifier</key><string>$APPLE_TEAM_ID.$IOS_BUNDLE_ID</string>
+            <key>com.apple.developer.team-identifier</key><string>$APPLE_TEAM_ID</string>
+            <key>get-task-allow</key><false/>
+          </dict></plist>
+          PLIST
+          plutil -lint "$staged_entitlements"
+          codesign --force --sign - --timestamp=none --entitlements "$staged_entitlements" "$app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+
+      - name: Export signed IPA
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
           export_options="$RUNNER_TEMP/ExportOptions.plist"
           plutil -create xml1 "$export_options"
           /usr/libexec/PlistBuddy -c 'Add :method string app-store-connect' "$export_options"
           /usr/libexec/PlistBuddy -c 'Add :destination string export' "$export_options"
-          /usr/libexec/PlistBuddy -c 'Add :signingStyle string manual' "$export_options"
+          /usr/libexec/PlistBuddy -c 'Add :signingStyle string automatic' "$export_options"
           /usr/libexec/PlistBuddy -c 'Add :signingCertificate string "Apple Distribution"' "$export_options"
           /usr/libexec/PlistBuddy -c "Add :teamID string $APPLE_TEAM_ID" "$export_options"
           /usr/libexec/PlistBuddy -c 'Add :manageAppVersionAndBuildNumber bool false' "$export_options"
           /usr/libexec/PlistBuddy -c 'Add :uploadSymbols bool true' "$export_options"
-          /usr/libexec/PlistBuddy -c 'Add :provisioningProfiles dict' "$export_options"
-          /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:$IOS_BUNDLE_ID string $PROVISIONING_PROFILE_NAME" "$export_options"
-          xcodebuild -exportArchive -archivePath "$ARCHIVE_PATH" -exportPath "$EXPORT_PATH" -exportOptionsPlist "$export_options"
+          xcodebuild -exportArchive -archivePath "$ARCHIVE_PATH" -exportPath "$EXPORT_PATH" -exportOptionsPlist "$export_options" -allowProvisioningUpdates -authenticationKeyPath "$ASC_KEY_PATH" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID"
           IPA_PATH="$(find "$EXPORT_PATH" -maxdepth 1 -type f -name '*.ipa' -print -quit)"
           test -n "$IPA_PATH"
           echo "IPA_PATH=$IPA_PATH" >> "$GITHUB_ENV"
@@ -189,6 +171,9 @@ jobs:
           ditto -x -k "$IPA_PATH" "$verify"
           app="$(find "$verify/Payload" -maxdepth 1 -type d -name '*.app' -print -quit)"
           codesign --verify --deep --strict --verbose=2 "$app"
+          signature="$(codesign -dvv "$app" 2>&1)"
+          [[ "$signature" == *'Authority=Apple Distribution'* ]]
+          [[ "$signature" == *"TeamIdentifier=$APPLE_TEAM_ID"* ]]
           [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")" == "$IOS_BUNDLE_ID" ]]
           [[ "$(/usr/libexec/PlistBuddy -c 'Print :ITSAppUsesNonExemptEncryption' "$app/Info.plist")" == "false" ]]
       - name: Validate and upload to TestFlight
