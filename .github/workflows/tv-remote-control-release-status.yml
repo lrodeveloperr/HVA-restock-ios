@@ -72,3 +72,19 @@ jobs:
               ].join(" ")
             end
           ' "$iaps"
+
+          price_schedule="$RUNNER_TEMP/app-price-schedule.json"
+          price_status="$(curl --silent --show-error -o "$price_schedule" -w '%{http_code}' -H "$auth" \
+            'https://api.appstoreconnect.apple.com/v1/apps/6809810611/appPriceSchedule')"
+          echo "appPriceScheduleStatus=$price_status"
+          if [[ "$price_status" == 200 ]]; then
+            ruby -rjson -e 'item=JSON.parse(File.read(ARGV[0])).fetch("data"); puts "appPriceScheduleId=#{item["id"]}"' "$price_schedule"
+          fi
+
+          availability="$RUNNER_TEMP/app-availability.json"
+          availability_status="$(curl --silent --show-error -o "$availability" -w '%{http_code}' -H "$auth" \
+            'https://api.appstoreconnect.apple.com/v1/apps/6809810611/appAvailabilityV2')"
+          echo "appAvailabilityStatus=$availability_status"
+          if [[ "$availability_status" == 200 ]]; then
+            ruby -rjson -e 'item=JSON.parse(File.read(ARGV[0])).fetch("data"); puts "appAvailabilityId=#{item["id"]} newTerritories=#{item.dig("attributes","availableInNewTerritories")}"' "$availability"
+          fi
