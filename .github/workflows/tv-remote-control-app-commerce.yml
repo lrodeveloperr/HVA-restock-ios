@@ -56,7 +56,7 @@ jobs:
             [response.code.to_i, response.body.nil? || response.body.empty? ? {} : JSON.parse(response.body)]
           end
 
-          _, points_payload = request(:get, "/v1/apps/#{APP_ID}/appPricePoints?filter%5Bterritory%5D=USA&limit=8000")
+          _, points_payload = request(:get, "/v1/apps/#{APP_ID}/appPricePoints?filter%5Bterritory%5D=USA&limit=200")
           free_point = points_payload.fetch("data").find do |item|
             customer_price = item.dig("attributes", "customerPrice")
             customer_price == "0" || customer_price == "0.00"
