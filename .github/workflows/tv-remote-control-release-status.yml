@@ -79,6 +79,17 @@ jobs:
           echo "appPriceScheduleStatus=$price_status"
           if [[ "$price_status" == 200 ]]; then
             ruby -rjson -e 'item=JSON.parse(File.read(ARGV[0])).fetch("data"); puts "appPriceScheduleId=#{item["id"]}"' "$price_schedule"
+            app_prices="$RUNNER_TEMP/app-prices.json"
+            curl --fail-with-body --silent --show-error --get -H "$auth" \
+              --data-urlencode 'filter[territory]=USA' \
+              --data-urlencode 'include=appPricePoint' \
+              --data-urlencode 'limit=200' \
+              "https://api.appstoreconnect.apple.com/v1/appPriceSchedules/6809810611/manualPrices" -o "$app_prices"
+            ruby -rjson -e '
+              payload=JSON.parse(File.read(ARGV[0]))
+              points=(payload["included"] || []).select { |item| item["type"] == "appPricePoints" }
+              puts "appUSAPrices=#{points.map { |item| item.dig("attributes","customerPrice") }.compact.join(",")}"
+            ' "$app_prices"
           fi
 
           availability="$RUNNER_TEMP/app-availability.json"
