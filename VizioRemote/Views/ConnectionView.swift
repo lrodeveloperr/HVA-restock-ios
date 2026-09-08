@@ -5,27 +5,30 @@ struct ConnectionView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 28) {
-                Spacer(minLength: 28)
+            VStack(spacing: 22) {
+                Spacer(minLength: 12)
 
                 Image(systemName: "tv.and.mediabox")
-                    .font(.system(size: 54, weight: .medium))
+                    .font(.system(size: 50, weight: .medium))
                     .foregroundStyle(Color.remoteBlue)
                     .accessibilityHidden(true)
 
                 VStack(spacing: 10) {
                     Text("Remote for Vizio TV Controller")
                         .font(.largeTitle.bold())
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
                     Text("A simple remote for Vizio SmartCast TVs")
                         .font(.body)
                         .foregroundStyle(Color.secondaryText)
                         .multilineTextAlignment(.center)
                 }
 
-                VStack(spacing: 14) {
-                    Label("This device and TV on the same Wi-Fi", systemImage: "wifi")
-                    Label("Compatible Vizio SmartCast televisions", systemImage: "checkmark.seal")
-                    Label("1-day trial · Optional one-time unlock · No ads", systemImage: "hand.raised")
+                VStack(alignment: .leading, spacing: 16) {
+                    requirementRow("This device and TV on the same Wi-Fi", systemImage: "wifi")
+                    requirementRow("Compatible Vizio SmartCast televisions", systemImage: "checkmark.seal")
+                    requirementRow("24-hour trial · no app account needed", systemImage: "clock")
+                    requirementRow("After 24 hours, buy once to keep control", systemImage: "lock.open")
                 }
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.82))
@@ -75,19 +78,22 @@ struct ConnectionView: View {
                     }
                 }
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 18) {
-                        Button("Enter IP Address") { model.showManualEntry = true }
-                        Text(verbatim: "·").foregroundStyle(Color.secondaryText)
-                        Button("Try Demo TV") { model.useDemoTV() }
-                    }
-                    VStack(spacing: 12) {
-                        Button("Enter IP Address") { model.showManualEntry = true }
-                        Button("Try Demo TV") { model.useDemoTV() }
-                    }
+                Button(action: model.useDemoTV) {
+                    Label("Try Demo TV", systemImage: "play.rectangle.fill")
+                        .frame(maxWidth: .infinity)
                 }
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(Color.remoteBlue)
+                .buttonStyle(OnboardingSecondaryButtonStyle())
+                .disabled(model.isBusy)
+
+                Button("Enter IP Address") { model.showManualEntry = true }
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(Color.remoteBlue)
+                    .disabled(model.isBusy)
+
+                Text("Try the demo instantly. Your real-TV trial starts only after you confirm.")
+                    .font(.caption)
+                    .foregroundStyle(Color.secondaryText)
+                    .multilineTextAlignment(.center)
 
                 Text("Remote for Vizio TV Controller is an independent app and is not affiliated with or endorsed by Vizio, Inc.")
                     .font(.caption2)
@@ -97,8 +103,23 @@ struct ConnectionView: View {
             }
             .frame(maxWidth: 520)
             .padding(.horizontal, 24)
-            .padding(.bottom, 28)
+            .padding(.bottom, 24)
             .frame(maxWidth: .infinity)
+        }
+        .scrollIndicators(.hidden)
+    }
+
+    private func requirementRow(
+        _ title: LocalizedStringKey,
+        systemImage: String
+    ) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: systemImage)
+                .font(.system(size: 17, weight: .medium))
+                .frame(width: 24)
+                .accessibilityHidden(true)
+            Text(title)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
@@ -114,6 +135,27 @@ struct PrimaryButtonStyle: ButtonStyle {
             .background(
                 Color.remoteBlue.opacity(configuration.isPressed ? 0.72 : 1),
                 in: RoundedRectangle(cornerRadius: 16)
+            )
+            .scaleEffect(configuration.isPressed ? 0.985 : 1)
+            .opacity(isEnabled ? 1 : 0.45)
+    }
+}
+
+private struct OnboardingSecondaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.headline)
+            .foregroundStyle(.white)
+            .padding(.vertical, 15)
+            .background(
+                Color.panelBackground.opacity(configuration.isPressed ? 0.72 : 1),
+                in: RoundedRectangle(cornerRadius: 16)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.white.opacity(0.16))
             )
             .scaleEffect(configuration.isPressed ? 0.985 : 1)
             .opacity(isEnabled ? 1 : 0.45)

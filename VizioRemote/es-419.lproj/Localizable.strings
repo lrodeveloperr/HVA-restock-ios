@@ -185,3 +185,17 @@
 "This removes every saved TV address, pairing token, certificate identity and app-generated TV client identifier from this device." = "Esto elimina de este dispositivo todas las direcciones de TV, tokens de vinculación, identidades de certificado e identificadores de cliente de TV generados por la app.";
 "All saved TV data was removed from this device." = "Se eliminaron de este dispositivo todos los datos guardados de TV.";
 "Some secure TV data could not be removed. Unlock this device and try again." = "No se pudieron eliminar algunos datos seguros de TV. Desbloquea este dispositivo e inténtalo de nuevo.";
+
+"Your TV is ready" = "Tu TV está lista";
+"Full remote access for 24 hours" = "Acceso completo al control remoto durante 24 horas";
+"24-hour trial · no app account needed" = "Prueba de 24 horas · sin cuenta en la app";
+"After 24 hours, buy once to keep control" = "Después de 24 horas, paga una vez para seguir usando el control";
+"Try the demo instantly. Your real-TV trial starts only after you confirm." = "Prueba la demostración al instante. La prueba con tu TV real empieza solo después de que confirmes.";
+"No app account, subscription or automatic charge" = "Sin cuenta en la app, suscripción ni cargos automáticos";
+"Start your free 24-hour trial" = "Inicia tu prueba gratis de 24 horas";
+"Start Free 24-Hour Trial · %@" = "Iniciar prueba gratis de 24 horas · %@";
+"24-hour trial available" = "Prueba de 24 horas disponible";
+"Trial ends %@" = "La prueba termina %@";
+"Close Settings" = "Cerrar Configuración";
+"24-hour trial" = "Prueba de 24 horas";
+"Ends" = "Termina";

@@ -19,7 +19,15 @@ struct RootView: View {
                 } else {
                     ConnectionView(model: model)
                 }
-            case .trialAvailable, .trialExpired, .verificationFailed:
+            case .trialAvailable:
+                if model.device?.isDemo == true {
+                    RemoteView(model: model, purchases: purchases)
+                } else if model.hasSavedTV {
+                    PurchaseGateView(purchases: purchases, model: model)
+                } else {
+                    ConnectionView(model: model)
+                }
+            case .trialExpired, .verificationFailed:
                 PurchaseGateView(purchases: purchases, model: model)
             }
         }
@@ -39,6 +47,9 @@ struct RootView: View {
             }
         }
         .onChange(of: purchases.hasRemoteAccess) { _, _ in
+            reconcileAccess()
+        }
+        .onChange(of: model.device) { _, _ in
             reconcileAccess()
         }
         .sheet(isPresented: $model.showManualEntry) {
@@ -78,10 +89,8 @@ struct RootView: View {
 
     private func reconcileAccess() {
         model.restoreLocalDeviceMetadata()
-        let enabled = purchases.hasRemoteAccess && scenePhase == .active
-        if !purchases.hasRemoteAccess {
-            purchases.showPurchaseSheet = false
-        }
+        let demoAccess = purchases.accessState == .trialAvailable && model.device?.isDemo == true
+        let enabled = scenePhase == .active && (purchases.hasRemoteAccess || demoAccess)
         model.setRemoteAccessEnabled(enabled)
         if enabled {
             model.restore()

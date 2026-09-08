@@ -32,9 +32,12 @@ struct RemoteView: View {
     private func trialBanner(endsAt end: Date) -> some View {
         Button { purchases.showPurchaseSheet = true } label: {
             HStack {
-                Label("1-day Trial", systemImage: "clock")
+                Label("24-hour trial", systemImage: "clock")
                 Spacer()
-                Text(end, style: .relative)
+                HStack(spacing: 3) {
+                    Text("Ends")
+                    Text(end, style: .relative)
+                }
                 Image(systemName: "chevron.right")
             }
             .font(.caption.weight(.semibold))

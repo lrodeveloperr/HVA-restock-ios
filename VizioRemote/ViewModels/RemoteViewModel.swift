@@ -39,7 +39,8 @@ final class RemoteViewModel: ObservableObject {
     var hasSavedTV: Bool { device != nil }
     var pairingIsDemo: Bool { pendingDevice?.isDemo == true }
     var canSendCommands: Bool {
-        !isManagingLocalData && (connectionState == .connected || connectionState == .sending)
+        remoteAccessEnabled && !isManagingLocalData &&
+            (connectionState == .connected || connectionState == .sending)
     }
     var canReconnect: Bool {
         remoteAccessEnabled && !isManagingLocalData && !isDrainingCommands && connectionState != .connecting
@@ -114,7 +115,7 @@ final class RemoteViewModel: ObservableObject {
     }
 
     func discover() {
-        guard remoteAccessEnabled, !isManagingLocalData else { return }
+        guard !isManagingLocalData else { return }
         discoveryTask?.cancel()
         pairingTask?.cancel()
         connectionState = .searching
@@ -136,7 +137,7 @@ final class RemoteViewModel: ObservableObject {
     }
 
     func connectManually(ipAddress: String, legacyPort: Bool) {
-        guard remoteAccessEnabled, !isManagingLocalData else { return }
+        guard !isManagingLocalData else { return }
         guard let host = LocalNetworkAddress.normalizedIPv4(ipAddress) else {
             alertMessage = SmartCastError.invalidAddress.localizedDescription
             return
@@ -152,7 +153,7 @@ final class RemoteViewModel: ObservableObject {
     }
 
     func beginPairing(with selectedDevice: TVDevice) {
-        guard remoteAccessEnabled, !isManagingLocalData else { return }
+        guard !isManagingLocalData else { return }
         discoveryTask?.cancel()
         pairingTask?.cancel()
         pairingCancelTask?.cancel()
@@ -186,11 +187,31 @@ final class RemoteViewModel: ObservableObject {
     }
 
     func useDemoTV() {
-        beginPairing(with: .demo)
+        guard !isManagingLocalData else { return }
+        suspend()
+        let demo = TVDevice.demo
+        let token = "DEMO-AUTH-TOKEN"
+        do {
+            try tokenStore.save(token, for: demo.id)
+            do {
+                try deviceStore.saveDevice(demo)
+            } catch {
+                try? tokenStore.deleteToken(for: demo.id)
+                throw error
+            }
+            cachedToken = (demo.id, token)
+            device = demo
+            hasRestored = true
+            connectionState = .connected
+        } catch {
+            device = nil
+            connectionState = .failed(message(for: error))
+            alertMessage = message(for: error)
+        }
     }
 
     func finishPairing(pin: String) {
-        guard remoteAccessEnabled, !isManagingLocalData else { return }
+        guard !isManagingLocalData else { return }
         guard let pendingDevice,
               let pairingChallenge,
               let operationID = pairingOperationID else { return }

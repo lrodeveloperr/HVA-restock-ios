@@ -185,3 +185,17 @@
 "This removes every saved TV address, pairing token, certificate identity and app-generated TV client identifier from this device." = "Cela supprime de cet appareil toutes les adresses de téléviseur, tous les jetons de jumelage, toutes les identités de certificat et tous les identifiants client générés par l’app.";
 "All saved TV data was removed from this device." = "Toutes les données de téléviseur enregistrées ont été supprimées de cet appareil.";
 "Some secure TV data could not be removed. Unlock this device and try again." = "Certaines données sécurisées du téléviseur n’ont pas pu être supprimées. Déverrouillez cet appareil et réessayez.";
+
+"Your TV is ready" = "Votre téléviseur est prêt";
+"Full remote access for 24 hours" = "Accès complet à la télécommande pendant 24 heures";
+"24-hour trial · no app account needed" = "Essai de 24 heures · aucun compte d’app requis";
+"After 24 hours, buy once to keep control" = "Après 24 heures, payez une fois pour garder la télécommande";
+"Try the demo instantly. Your real-TV trial starts only after you confirm." = "Essayez la démo instantanément. L’essai avec votre téléviseur commence seulement après votre confirmation.";
+"No app account, subscription or automatic charge" = "Aucun compte d’app, abonnement ni frais automatiques";
+"Start your free 24-hour trial" = "Commencez votre essai gratuit de 24 heures";
+"Start Free 24-Hour Trial · %@" = "Commencer l’essai gratuit de 24 heures · %@";
+"24-hour trial available" = "Essai de 24 heures disponible";
+"Trial ends %@" = "L’essai prend fin %@";
+"Close Settings" = "Fermer Réglages";
+"24-hour trial" = "Essai de 24 heures";
+"Ends" = "Fin";

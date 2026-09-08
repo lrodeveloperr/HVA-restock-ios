@@ -13,13 +13,13 @@ struct PurchaseGateView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 22) {
-                    Image(systemName: "tv.and.mediabox")
-                        .font(.system(size: 54, weight: .medium))
-                        .foregroundStyle(Color.remoteBlue)
+                    Image(systemName: isTVReadyForTrial ? "checkmark.circle.fill" : "tv.and.mediabox")
+                        .font(.system(size: isTVReadyForTrial ? 48 : 54, weight: .medium))
+                        .foregroundStyle(isTVReadyForTrial ? Color.green : Color.remoteBlue)
                         .accessibilityHidden(true)
 
                     VStack(spacing: 8) {
-                        Text("Remote for Vizio TV Controller")
+                        Text(primaryTitle)
                             .font(.largeTitle.bold())
                             .multilineTextAlignment(.center)
                         Text(headline)
@@ -28,9 +28,9 @@ struct PurchaseGateView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("Use all included remote controls for 24 hours", systemImage: "clock")
-                        Label("No ads and no separate app account", systemImage: "hand.raised")
-                        Label("Keep access with one optional purchase", systemImage: "checkmark.seal")
+                        Label(firstBenefit, systemImage: "clock")
+                        Label(secondBenefit, systemImage: "hand.raised")
+                        Label("After 24 hours, buy once to keep control", systemImage: "checkmark.seal")
                     }
                     .font(.subheadline)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -133,7 +133,34 @@ struct PurchaseGateView: View {
         )
     }
 
+    private var isTVReadyForTrial: Bool {
+        purchases.accessState == .trialAvailable &&
+            model?.device != nil &&
+            model?.device?.isDemo == false
+    }
+
+    private var primaryTitle: String {
+        isTVReadyForTrial
+            ? String(localized: "Your TV is ready")
+            : String(localized: "Remote for Vizio TV Controller")
+    }
+
+    private var firstBenefit: String {
+        isTVReadyForTrial
+            ? String(localized: "Full remote access for 24 hours")
+            : String(localized: "Use all included remote controls for 24 hours")
+    }
+
+    private var secondBenefit: String {
+        isTVReadyForTrial
+            ? String(localized: "No app account, subscription or automatic charge")
+            : String(localized: "No ads and no separate app account")
+    }
+
     private var headline: String {
+        if isTVReadyForTrial {
+            return String(localized: "Start your free 24-hour trial")
+        }
         switch purchases.accessState {
         case .trialExpired:
             return String(localized: "Your 1-day trial has ended")
@@ -147,7 +174,7 @@ struct PurchaseGateView: View {
     }
 
     private var trialButtonTitle: String {
-        let format = String(localized: "Start 1-day Trial · %@")
+        let format = String(localized: "Start Free 24-Hour Trial · %@")
         return String(format: format, trialDisplayPrice)
     }
 

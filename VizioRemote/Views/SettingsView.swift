@@ -75,8 +75,11 @@ struct SettingsView: View {
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                ToolbarItem(placement: .cancellationAction) {
+                    Button { dismiss() } label: {
+                        Label("Back", systemImage: "chevron.left")
+                    }
+                    .accessibilityHint("Close Settings")
                 }
             }
             .confirmationDialog(
@@ -108,8 +111,10 @@ struct SettingsView: View {
     private var accessLabel: String {
         switch purchases.accessState {
         case .loading: return String(localized: "Checking…")
-        case .trialAvailable: return String(localized: "Trial available")
-        case .trialActive: return String(localized: "1-day Trial active")
+        case .trialAvailable: return String(localized: "24-hour trial available")
+        case .trialActive(let end):
+            let format = String(localized: "Trial ends %@")
+            return String(format: format, end.formatted(date: .abbreviated, time: .shortened))
         case .trialExpired: return String(localized: "Trial ended")
         case .verificationFailed: return String(localized: "Purchase verification needed")
         case .lifetimeUnlocked: return String(localized: "Full remote unlocked")

@@ -185,3 +185,17 @@
 "This removes every saved TV address, pairing token, certificate identity and app-generated TV client identifier from this device." = "This removes every saved TV address, pairing token, certificate identity and app-generated TV client identifier from this device.";
 "All saved TV data was removed from this device." = "All saved TV data was removed from this device.";
 "Some secure TV data could not be removed. Unlock this device and try again." = "Some secure TV data could not be removed. Unlock this device and try again.";
+
+"Your TV is ready" = "Your TV is ready";
+"Full remote access for 24 hours" = "Full remote access for 24 hours";
+"24-hour trial · no app account needed" = "24-hour trial · no app account needed";
+"After 24 hours, buy once to keep control" = "After 24 hours, buy once to keep control";
+"Try the demo instantly. Your real-TV trial starts only after you confirm." = "Try the demo instantly. Your real-TV trial starts only after you confirm.";
+"No app account, subscription or automatic charge" = "No app account, subscription or automatic charge";
+"Start your free 24-hour trial" = "Start your free 24-hour trial";
+"Start Free 24-Hour Trial · %@" = "Start Free 24-Hour Trial · %@";
+"24-hour trial available" = "24-hour trial available";
+"Trial ends %@" = "Trial ends %@";
+"Close Settings" = "Close Settings";
+"24-hour trial" = "24-hour trial";
+"Ends" = "Ends";
