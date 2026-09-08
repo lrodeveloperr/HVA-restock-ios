@@ -1,8 +1,8 @@
-# TV Remote Control — Supplemental Terms of Use
+# Remote for Vizio TV Controller — Supplemental Terms of Use
 
 **Effective date: September 8, 2026**
 
-These disclosures supplement the Apple Standard Licensed Application End User License Agreement, which governs the license for TV Remote Control. If these disclosures conflict with Apple’s standard agreement, the applicable agreement and law control.
+These disclosures supplement the Apple Standard Licensed Application End User License Agreement, which governs the license for Remote for Vizio TV Controller. If these disclosures conflict with Apple’s standard agreement, the applicable agreement and law control.
 
 ## Requirements and compatibility
 
@@ -22,7 +22,7 @@ Use the app only with televisions and networks you are authorized to control. Do
 
 ## Independent app
 
-TV Remote Control is independent and is not affiliated with or endorsed by Vizio, Inc. Vizio and SmartCast are trademarks of their owner and are referenced only to describe compatibility.
+Remote for Vizio TV Controller is independent and is not affiliated with or endorsed by Vizio, Inc. Vizio and SmartCast are trademarks of their owner and are referenced only to describe compatibility.
 
 ## Contact
 

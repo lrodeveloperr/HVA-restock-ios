@@ -55,16 +55,20 @@ final class RemoteViewModelLifecycleTests: XCTestCase {
         await Task.yield()
     }
 
-    func testDiscoveryIsDeniedWithoutEntitlement() async {
+    func testDiscoveryIsAllowedBeforeEntitlementForPairFirstOnboarding() async {
         let discovery = CountingDiscovery()
         let model = makeModel(discovery: discovery)
 
         model.discover()
-        await Task.yield()
+        for _ in 0..<100 {
+            if await discovery.callCount == 1 { break }
+            await Task.yield()
+        }
 
         let callCount = await discovery.callCount
-        XCTAssertEqual(callCount, 0)
-        XCTAssertEqual(model.connectionState, .disconnected)
+        XCTAssertEqual(callCount, 1)
+        XCTAssertEqual(model.connectionState, .searching)
+        model.suspend()
     }
 
     func testRemovalBlocksNewNetworkAndPairingEntryPoints() {

@@ -1,8 +1,8 @@
-# TV Remote Control Privacy Policy
+# Remote for Vizio TV Controller Privacy Policy
 
 **Effective date: September 8, 2026**
 
-TV Remote Control does not send personal data to WorksBien Studios Inc. The app has no developer-operated account, advertising, analytics, tracking or cloud service.
+Remote for Vizio TV Controller does not send personal data to WorksBien Studios Inc. The app has no developer-operated account, advertising, analytics, tracking or cloud service.
 
 ## Local network
 
@@ -33,4 +33,4 @@ Material changes will be reflected by updating this policy and its effective dat
 WorksBien Studios Inc.  
 `https://worksbienstudios.com/customerservice`
 
-TV Remote Control is independent and is not affiliated with or endorsed by Vizio, Inc.
+Remote for Vizio TV Controller is independent and is not affiliated with or endorsed by Vizio, Inc.

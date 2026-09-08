@@ -3,6 +3,7 @@ import SwiftUI
 struct PurchaseGateView: View {
     @ObservedObject var purchases: PurchaseManager
     let model: RemoteViewModel?
+    @Environment(\.locale) private var locale
 
     init(purchases: PurchaseManager, model: RemoteViewModel? = nil) {
         self.purchases = purchases
@@ -91,14 +92,10 @@ struct PurchaseGateView: View {
 
                     ViewThatFits(in: .horizontal) {
                         HStack(spacing: 18) {
-                            NavigationLink("Privacy") { PrivacySummaryView() }
-                            NavigationLink("Terms") { TermsSummaryView() }
-                            Link("Support", destination: URL(string: "https://worksbienstudios.com/customerservice")!)
+                            purchaseLegalLinks
                         }
                         VStack(spacing: 12) {
-                            NavigationLink("Privacy") { PrivacySummaryView() }
-                            NavigationLink("Terms") { TermsSummaryView() }
-                            Link("Support", destination: URL(string: "https://worksbienstudios.com/customerservice")!)
+                            purchaseLegalLinks
                         }
                     }
                     .font(.footnote.weight(.medium))
@@ -131,6 +128,13 @@ struct PurchaseGateView: View {
             actions: { Button("OK", role: .cancel) { purchases.errorMessage = nil } },
             message: { Text(purchases.errorMessage ?? "") }
         )
+    }
+
+    @ViewBuilder private var purchaseLegalLinks: some View {
+        Link("Privacy", destination: AppLegalLinks.privacy(for: locale))
+        Link("Terms", destination: AppLegalLinks.terms(for: locale))
+        Link("Purchase Terms", destination: AppLegalLinks.purchases)
+        Link("Support", destination: AppLegalLinks.support)
     }
 
     private var isTVReadyForTrial: Bool {

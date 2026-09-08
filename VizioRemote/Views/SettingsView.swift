@@ -1,9 +1,38 @@
 import SwiftUI
 
+enum AppLegalLinks {
+    private static let baseURL = "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control"
+
+    static func privacy(for locale: Locale) -> URL {
+        documentURL(named: "privacy", locale: locale)
+    }
+
+    static func terms(for locale: Locale) -> URL {
+        documentURL(named: "terms", locale: locale)
+    }
+
+    static let purchases = URL(string: "\(baseURL)/purchases/")!
+    static let support = URL(string: "https://worksbienstudios.com/customerservice")!
+
+    private static func documentURL(named document: String, locale: Locale) -> URL {
+        let identifier = locale.identifier.lowercased()
+        let languagePath: String
+        if identifier.hasPrefix("es") {
+            languagePath = "es/"
+        } else if identifier.hasPrefix("fr") {
+            languagePath = "fr-ca/"
+        } else {
+            languagePath = ""
+        }
+        return URL(string: "\(baseURL)/\(languagePath)\(document)/")!
+    }
+}
+
 struct SettingsView: View {
     @ObservedObject var model: RemoteViewModel
     @ObservedObject var purchases: PurchaseManager
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.locale) private var locale
     @AppStorage("haptics.enabled") private var hapticsEnabled = true
     @State private var confirmForget = false
     @State private var confirmRemoveAll = false
@@ -54,7 +83,10 @@ struct SettingsView: View {
                     NavigationLink("Terms of Use") {
                         TermsSummaryView()
                     }
-                    Link("Customer Support", destination: URL(string: "https://worksbienstudios.com/customerservice")!)
+                    Link("Full Privacy Policy", destination: AppLegalLinks.privacy(for: locale))
+                    Link("Supplemental Terms", destination: AppLegalLinks.terms(for: locale))
+                    Link("Trial and Purchase Terms", destination: AppLegalLinks.purchases)
+                    Link("Customer Support", destination: AppLegalLinks.support)
                 }
 
                 Section {

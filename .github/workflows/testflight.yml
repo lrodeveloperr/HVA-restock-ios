@@ -1,4 +1,4 @@
-name: TV Remote Control TestFlight
+name: Remote for Vizio TV Controller TestFlight
 
 on:
   workflow_dispatch:
@@ -35,7 +35,7 @@ concurrency:
 env:
   IOS_BUNDLE_ID: com.worksbienstudios.clearmote
   APPLE_TEAM_ID: 49SQ3XQ68Q
-  APP_NAME: 'TV Remote Control: Simple'
+  APP_NAME: 'Remote for Vizio TV Controller'
   APP_SKU: tv-remote-control-ios
   PROVISIONING_PROFILE_NAME: TV Remote Control App Store CI
   SCHEME: VizioRemote
@@ -193,6 +193,26 @@ jobs:
           [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconName' "$app/Info.plist")" == "AppIcon" ]]
           [[ -f "$app/AppIcon60x60@2x.png" ]]
           [[ -f "$app/AppIcon76x76@2x.png" ]]
+
+          inspection="$RUNNER_TEMP/signed-inspection"
+          mkdir -p "$inspection"
+          git rev-parse HEAD > "$inspection/source-commit.txt"
+          cp "$app/Info.plist" "$inspection/Info.plist"
+          test -f "$app/PrivacyInfo.xcprivacy"
+          cp "$app/PrivacyInfo.xcprivacy" "$inspection/PrivacyInfo.xcprivacy"
+          codesign -d --entitlements :- "$app" > "$inspection/signed-entitlements.plist"
+          plutil -lint "$inspection/signed-entitlements.plist" "$inspection/PrivacyInfo.xcprivacy"
+          [[ "$(/usr/libexec/PlistBuddy -c 'Print :com.apple.developer.networking.multicast' "$inspection/signed-entitlements.plist")" == "true" ]]
+          [[ "$(plutil -extract NSPrivacyTracking raw -o - "$inspection/PrivacyInfo.xcprivacy")" == "false" ]]
+          plutil -extract NSPrivacyTrackingDomains json -o - "$inspection/PrivacyInfo.xcprivacy" | ruby -rjson -e 'abort "Tracking domains are not empty" unless JSON.parse(STDIN.read).empty?'
+          plutil -extract NSPrivacyCollectedDataTypes json -o - "$inspection/PrivacyInfo.xcprivacy" | ruby -rjson -e 'abort "Collected data types are not empty" unless JSON.parse(STDIN.read).empty?'
+          plutil -convert json -o - "$inspection/PrivacyInfo.xcprivacy" | ruby -rjson -e 'doc=JSON.parse(STDIN.read); entry=doc.fetch("NSPrivacyAccessedAPITypes").find{|item| item["NSPrivacyAccessedAPIType"]=="NSPrivacyAccessedAPICategoryUserDefaults"}; abort "Missing required UserDefaults reason CA92.1" unless entry && entry.fetch("NSPrivacyAccessedAPITypeReasons").include?("CA92.1")'
+          {
+            find "$app" -type d -name '*.framework' -prune -print
+            find "$app" -type f -name '*.dylib' -print
+          } | sort > "$inspection/embedded-code.txt"
+          ruby -e 'bad=File.readlines(ARGV[0], chomp:true).reject{|path| File.basename(path).match?(/\Alibswift.*\.dylib\z/)}; abort "Unexpected embedded code:\n#{bad.join("\n")}" unless bad.empty?' "$inspection/embedded-code.txt"
+          echo "SIGNED_INSPECTION_PATH=$inspection" >> "$GITHUB_ENV"
       - name: Validate and upload to TestFlight
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
@@ -203,5 +223,7 @@ jobs:
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: TV-Remote-Control-TestFlight-${{ env.BUILD_NUMBER }}
-          path: ${{ env.IPA_PATH }}
-          retention-days: 7
+          path: |
+            ${{ env.IPA_PATH }}
+            ${{ env.SIGNED_INSPECTION_PATH }}
+          retention-days: 14
