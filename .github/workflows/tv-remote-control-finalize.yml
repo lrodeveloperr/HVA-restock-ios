@@ -252,7 +252,7 @@ jobs:
             },
           })
 
-          _, rating_doc = request(:get, "/v1/apps/#{APP_ID}/ageRatingDeclaration")
+          _, rating_doc = request(:get, "/v1/appInfos/#{app_info_id}/ageRatingDeclaration")
           rating = rating_doc.fetch("data")
           enum_fields = %w[
             alcoholTobaccoOrDrugUseOrReferences contests gamblingSimulated gunsOrOtherWeapons
