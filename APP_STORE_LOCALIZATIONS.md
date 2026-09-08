@@ -4,10 +4,10 @@ Use these records only after the English source in `APP_STORE.md` is frozen. Con
 
 ## Spanish (Mexico)
 
-- Name: **Control TV: Mando Simple**
-- Subtitle: **Controles Wi-Fi simples**
+- Name: **Control Remoto para Vizio**
+- Subtitle: **Control WiFi y Teclado**
 - Promotional text: **Prueba todas las funciones gratis durante un día y conserva el acceso con una compra opcional. Sin anuncios, cuenta propia ni suscripción.**
-- Keywords: `volumen,teclado,entrada,canal,navegación,multimedia,controlador,televisor inteligente`
+- Keywords: `volumen,entrada,canal,navegación,multimedia,encendido,botones,vinculación`
 
 ### Description
 
@@ -49,10 +49,10 @@ Esta es una app independiente, no afiliada ni respaldada por Vizio, Inc. Vizio y
 
 ## French (Canada)
 
-- Name: **Télécommande TV : Simple**
-- Subtitle: **Commandes Wi-Fi simples**
+- Name: **Télécommande pour Vizio**
+- Subtitle: **Commande WiFi et Clavier**
 - Promotional text: **Essayez toutes les fonctions gratuitement pendant un jour, puis gardez l’accès avec un achat facultatif. Sans publicité, compte distinct ni abonnement.**
-- Keywords: `volume,clavier,entrée,chaîne,navigation,média,contrôleur,téléviseur intelligent`
+- Keywords: `volume,entrée,chaîne,navigation,média,alimentation,boutons,jumelage`
 
 ### Description
 

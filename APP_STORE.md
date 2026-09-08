@@ -1,14 +1,14 @@
 # App Store submission pack
 
-Status: **prepared, not submission-ready**. Items marked BLOCKED require App Store Connect, Xcode, physical Apple hardware or a compatible television.
+Status: **TestFlight build uploaded and Apple-validated; App Store review intentionally not submitted**. Build `2609081633.5` is processed as `VALID`, the version record and non-media metadata are complete, and the build is assigned to the internal testing group. Physical hardware checks and final media/account-owner actions remain before production submission.
 
 ## Product record
 
-- App Store name: **TV Remote Control**
-- Subtitle: **Simple Wi-Fi Controls**
+- App Store name: **Remote for Vizio Smart TV**
+- Subtitle: **WiFi Controller & Keyboard**
 - Home Screen name: **TV Remote**
 - Bundle ID: `com.worksbienstudios.clearmote`
-- Version/build: confirm from the archive before submission
+- Version/build: release version / TestFlight build `2609081633.5`
 - Platforms: iPhone and iPad, iOS 17+
 - Primary category: Utilities
 - Secondary category: Entertainment
@@ -16,10 +16,12 @@ Status: **prepared, not submission-ready**. Items marked BLOCKED require App Sto
 - Age rating recommendation: 4+; complete the current questionnaire from actual content
 - Copyright: 2026 WorksBien Studios Inc.
 - Support URL: `https://worksbienstudios.com/customerservice`
-- Privacy URL: BLOCKED until `PRIVACY.md` is published at a stable public HTTPS URL
+- Marketing URL: `https://worksbienstudios.com/apps/tv-remote-control`
+- Privacy URL: `https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/privacy/`
+- Supplemental terms URL: `https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/terms/`
 - Terms: Apple Standard Licensed Application EULA plus the disclosures in `TERMS.md`
 
-The generic name avoids implying vendor ownership. Mention Vizio/SmartCast only in compatibility prose, never in the title, subtitle, icon or keyword field unless written authorization is obtained.
+The title uses “for Vizio” once as a compatibility statement and avoids logos, official claims or brand styling. Keep the independence disclaimer prominent and do not repeat third-party marks in the subtitle or keyword field.
 
 ## In-app purchases
 
@@ -28,11 +30,11 @@ The generic name avoids implying vendor ownership. Mention Vizio/SmartCast only 
 | 1-day Trial | `com.worksbienstudios.clearmote.trial.1day` | Non-consumable | Price tier 0 / Free | All remote features for 24 hours from verified purchase date |
 | Full Remote Unlock | `com.worksbienstudios.clearmote.lifetime` | Non-consumable | Recommended US storefront price: $2.99 | Full remote access; entitlement does not expire |
 
-The trial is explicit opt-in, does not renew and causes no automatic downstream charge. The optional unlock is purchased separately. The app displays the StoreKit localized price, not a hard-coded amount. Configure both products and their English, Spanish (Mexico) and French (Canada) localizations in App Store Connect, submit them with the app version, and upload an IAP review screenshot showing the actual purchase screen.
+The trial is explicit opt-in, does not renew and causes no automatic downstream charge. The optional unlock is purchased separately. The app displays the StoreKit localized price, not a hard-coded amount. Both products and their English, Spanish (Mexico) and French (Canada) localizations are configured in App Store Connect; the lifetime unlock is priced at US $2.99. Upload an IAP review screenshot showing the actual purchase screen before submission. The products remain in `MISSING_METADATA` until their required review media is attached.
 
 ## Promotional text
 
-Try every remote feature free for one day, then keep access with one optional purchase. No ads, accounts or subscriptions.
+Try every remote feature free for one day, then keep access with one optional purchase. No ads, separate app account or subscription.
 
 ## Description
 
@@ -45,7 +47,7 @@ FEATURES
 • Direction pad with a large OK button  
 • Volume, mute and channel controls  
 • Home, back, menu and input controls  
-• Play/Pause button (availability varies by TV app and firmware)  
+• Separate Play and Pause controls (availability varies by TV app and firmware)  
 • Basic Latin keyboard entry  
 • Manual IP fallback  
 • Built-in Demo TV for exploring the interface
@@ -56,7 +58,7 @@ Start the free 1-day Trial to use every remote feature for 24 hours. Access stop
 
 PRIVATE BY DESIGN
 
-• No account  
+• No separate app account  
 • No advertising or analytics SDKs  
 • No developer-operated cloud service  
 • Commands travel directly between this device and the selected television  
@@ -70,7 +72,7 @@ TV Remote Control is an independent application and is not affiliated with or en
 
 ## Keywords
 
-`controller,volume,keyboard,input,channel,navigation,media,smart television`
+`volume,input,channel,navigation,media,power,dpad,buttons,pairing`
 
 Do not repeat words from the title/subtitle and do not add vendor or competitor trademarks without approval. Re-check the live 100-character limit in App Store Connect.
 
@@ -86,17 +88,17 @@ Review path:
 4. Exercise the remote buttons and basic text entry.
 5. Open Settings to test **Restore Purchases**, **Forget This TV** or **Remove All Saved TV Data**.
 
-The optional **Full Remote Unlock** is a separate one-time non-consumable. There are no subscriptions, ads, accounts or backend servers. Automatic discovery uses SSDP multicast; manual private-IPv4 entry is available. The multicast entitlement must be present in the submitted build.
+The optional **Full Remote Unlock** is a separate one-time non-consumable. There are no subscriptions, ads, separate app accounts or backend servers. Automatic discovery uses SSDP multicast; manual private-IPv4 entry is available. The multicast entitlement must be present in the submitted build.
 
 ## App Privacy answers
 
 Based on the current source, select **Data Not Collected** only after the release binary is checked for added SDKs. The developer does not receive TV addresses, commands, tokens, certificate pins or payment details. Apple processes StoreKit transactions. The app locally reads verified product ID, product type, purchase date, revocation/current-entitlement state and localized price to enforce access.
 
-Tracking: No. Advertising: No. Account: No. Third-party analytics: No.
+Tracking: No. Advertising: No. Separate app account: No. Third-party analytics: No.
 
 ## Export compliance
 
-The app uses Apple URLSession/TLS and Keychain APIs; it contains no custom cryptographic implementation. Confirm the current App Store Connect encryption questionnaire with counsel/current Apple documentation. Set `ITSAppUsesNonExemptEncryption` only after that determination; it is intentionally not guessed in the project.
+The app uses Apple URLSession/TLS and Keychain APIs and contains no custom cryptographic implementation. The project declares `ITSAppUsesNonExemptEncryption = false`. Reconfirm this answer against the final binary and Apple’s current export-compliance questionnaire before submission.
 
 ## Screenshot plan
 
@@ -106,15 +108,18 @@ The app uses Apple URLSession/TLS and Keychain APIs; it contains no custom crypt
 - iPhone and iPad: keyboard/settings as useful
 - Localize visible copy for Spanish (Mexico) and French (Canada)
 
-Use screenshots from the final signed build. Generated prototypes are not evidence for App Review or the IAP review screenshot.
+A six-image iPhone/iPad screenshot set was generated from the release UI and visually reviewed. Attach the final-device exports to the App Store version and use the purchase-screen image for IAP review media before submission.
 
 ## Submission blockers
 
-- Xcode build, analyzer, unit/UI/StoreKit tests and release archive have not been run in this Linux environment.
-- Real iPhone/iPad and real compatible-TV pairing/command/power testing is incomplete.
-- SSDP unicast reply handling, dual-stack/NAT64 behavior and firmware coverage are unverified.
-- Multicast entitlement approval is unverified.
-- App Store agreements, products, localizations, prices, tax/banking, screenshots and review submission require the account holder.
-- Public privacy/terms URLs are not yet confirmed.
-- The current support page must add TV Remote Control to its app selector and verify the contact path.
+- Final source commit `a95b6e579d3dd217f0932d4f3b938e617d458478` passed project/localization validation, Debug and warning-as-error Release builds, static analysis and the complete Xcode unit/StoreKit recovery suite.
+- The copied release source was signed, archived, Apple-validated and uploaded as TestFlight build `2609081633.5`; App Store Connect reports `processingState=VALID`.
+- The app record now contains localized metadata, categories, age rating, content rights, copyright, manual release selection, reviewer details and the processed build. No App Store review submission was created.
+- The free trial and lifetime IAP records/localizations exist and the lifetime price is US $2.99; required IAP review media still needs to be attached.
+- A six-image iPhone/iPad screenshot set is ready and visually reviewed but still needs to be attached to the App Store record.
+- The build is assigned to `TV Remote Control Internal Testers`; the Account Holder must be enabled as an internal tester in App Store Connect before it appears in that person's TestFlight app. Apple's API rejected assigning the existing email-only beta-tester identity.
+- Real iPhone/iPad and compatible-TV discovery, pairing, command, power and text-entry testing remain incomplete.
+- Multicast entitlement presence in the final signed binary, IPv6-only/NAT64 behavior and representative firmware coverage remain unverified.
+- Agreements and tax/banking status remain publisher-account checks.
+- The public privacy, terms, purchase and support pages are live; reconfirm them immediately before submission.
 - Trademark/compatibility wording needs the publisher's final legal approval.

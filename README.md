@@ -1,4 +1,4 @@
-# TV Remote Control for iPhone and iPad
+# Remote for Vizio Smart TV
 
 A native SwiftUI remote for compatible Vizio SmartCast televisions. The app talks directly to the selected television over the local network; it has no developer-operated backend, advertising, analytics or account system.
 

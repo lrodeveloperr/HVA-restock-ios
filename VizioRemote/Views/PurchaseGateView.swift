@@ -19,7 +19,7 @@ struct PurchaseGateView: View {
                         .accessibilityHidden(true)
 
                     VStack(spacing: 8) {
-                        Text("TV Remote Control")
+                        Text("Remote for Vizio Smart TV")
                             .font(.largeTitle.bold())
                             .multilineTextAlignment(.center)
                         Text(headline)

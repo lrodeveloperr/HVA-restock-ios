@@ -1,4 +1,4 @@
-"TV Remote Control" = "Télécommande TV";
+"Remote for Vizio Smart TV" = "Télécommande pour Vizio";
 "TV Remote" = "Télécommande TV";
 "A simple remote for Vizio SmartCast TVs" = "Une télécommande simple pour les téléviseurs Vizio SmartCast";
 "This device and TV on the same Wi-Fi" = "Cet appareil et le téléviseur doivent utiliser le même réseau Wi-Fi";
@@ -10,7 +10,7 @@
 "FOUND ON YOUR NETWORK" = "TROUVÉS SUR VOTRE RÉSEAU";
 "Enter IP Address" = "Saisir l’adresse IP";
 "Try Demo TV" = "Essayer le téléviseur démo";
-"TV Remote Control is an independent app and is not affiliated with or endorsed by Vizio, Inc." = "Télécommande TV est une app indépendante qui n’est ni affiliée à Vizio, Inc. ni approuvée par celle-ci.";
+"Remote for Vizio Smart TV is an independent app and is not affiliated with or endorsed by Vizio, Inc." = "Télécommande pour Vizio est une app indépendante qui n’est ni affiliée à Vizio, Inc. ni approuvée par celle-ci.";
 "Vizio TV" = "Téléviseur Vizio";
 "Vizio SmartCast TV" = "Téléviseur Vizio SmartCast";
 "Demo Living Room TV" = "Téléviseur démo du salon";
@@ -52,12 +52,12 @@
 "Privacy Summary" = "Résumé de la confidentialité";
 "Customer Support" = "Soutien à la clientèle";
 "Forget This TV" = "Oublier ce téléviseur";
-"TV Remote Control %@ (%@)\nFree 1-day trial. Optional one-time unlock.\nNo ads or subscriptions. Independent and not affiliated with Vizio, Inc." = "Télécommande TV %@ (%@)\nEssai gratuit de 1 jour. Déverrouillage unique facultatif.\nSans publicité ni abonnement. App indépendante et non affiliée à Vizio, Inc.";
+"Remote for Vizio Smart TV %@ (%@)\nFree 1-day trial. Optional one-time unlock.\nNo ads or subscriptions. Independent and not affiliated with Vizio, Inc." = "Télécommande pour Vizio %@ (%@)\nEssai gratuit de 1 jour. Déverrouillage unique facultatif.\nSans publicité ni abonnement. App indépendante et non affiliée à Vizio, Inc.";
 "Done" = "Terminé";
 "Forget this TV?" = "Oublier ce téléviseur?";
 "Forget TV" = "Oublier le téléviseur";
 "Cancel" = "Annuler";
-"TV Remote Control does not collect, transmit, sell or share personal data with WorksBien Studios. It contains no advertising or analytics SDKs." = "Télécommande TV ne recueille, ne transmet, ne vend et ne partage aucune donnée personnelle avec WorksBien Studios. Elle ne contient aucune publicité ni aucun module d’analyse.";
+"Remote for Vizio Smart TV does not collect, transmit, sell or share personal data with WorksBien Studios. It contains no advertising or analytics SDKs." = "Télécommande pour Vizio ne recueille, ne transmet, ne vend et ne partage aucune donnée personnelle avec WorksBien Studios. Elle ne contient aucune publicité ni aucun module d’analyse.";
 "Local network" = "Réseau local";
 "Enter the TV PIN" = "Saisir le NIP du téléviseur";
 "PIN" = "NIP";

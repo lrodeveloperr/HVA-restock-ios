@@ -4,23 +4,26 @@ No release is approved until every BLOCKED item below has evidence attached to t
 
 ## Source and identity
 
-- [x] Generic customer-facing name **TV Remote Control**; vendor brand limited to compatibility context.
+- [x] Search-led name **Remote for Vizio Smart TV** uses “for Vizio” solely to state compatibility; the app and listing retain an explicit independence disclaimer.
 - [x] Bundle ID `com.worksbienstudios.clearmote` reconciled with product IDs.
 - [x] English, Spanish (Latin America) and French (Canada) string-key and placeholder parity checked statically.
 - [x] App has no third-party SDK or backend dependency in source.
-- [ ] BLOCKED: confirm legal entity, copyright, support URL, privacy URL and trademark wording.
+- [x] Legal entity, copyright, support URL and privacy URL entered in the App Store record.
+- [ ] BLOCKED: obtain publisher's final legal approval for trademark/compatibility wording.
 - [x] Source and release workflows committed to private repository `lrodeveloperr/tv-remote-control-ios`.
 
 ## Build and automated verification
 
 - [x] Debug simulator build completed with Xcode on hosted macOS.
-- [ ] BLOCKED: warning-as-error Release simulator build and analyzer must be green on the final commit.
+- [x] Warning-as-error Release simulator build and Xcode Static Analyzer are green on final source commit `a95b6e579d3dd217f0932d4f3b938e617d458478`.
 - [x] Lifecycle/access unit cases added for local-data management without entitlement, access revocation and denied discovery.
 - [x] All current Swift unit tests executed successfully in Xcode after correcting the boolean pairing-token parser defect.
 - [ ] BLOCKED: add/execute UI lifecycle cases for background, trial expiry and stale sheets.
-- [ ] BLOCKED: run StoreKit configuration tests for available, active, 24-hour boundary, expired, pending, cancelled, refunded/revoked, lifetime and restore states.
-- [ ] BLOCKED: run Thread Sanitizer, Address Sanitizer and Xcode Static Analyzer as applicable.
-- [ ] BLOCKED: archive, validate and inspect the exact submitted binary for entitlements, privacy manifest and unexpected SDKs.
+- [x] Complete StoreKit configuration/recovery suite passed in the signed-upload workflow, including trial, lifetime and restore/revocation paths.
+- [x] Xcode Static Analyzer completed successfully.
+- [ ] BLOCKED: run Thread Sanitizer and Address Sanitizer where applicable.
+- [x] Signed archive exported, Apple validation succeeded and TestFlight build `2609081633.5` uploaded; App Store Connect processing state is `VALID`.
+- [ ] BLOCKED: independently dump and verify final signed entitlements/privacy manifest and confirm no unexpected embedded SDKs.
 - [x] Python protocol fixture self-test completed in the supplied environment; this is not a Swift/iOS stress test.
 - [x] Static localization, JSON/XML and project-reference checks included in `AUDIT_REPORT.md`.
 
@@ -60,13 +63,18 @@ No release is approved until every BLOCKED item below has evidence attached to t
 
 - [x] TV Remote Control is present in the live support selector and routes requests to `info@worksbienstudios.com`.
 - [x] Final privacy, terms, purchase and localized policy pages are published at stable public HTTPS URLs.
-- [ ] BLOCKED: enter the exact live URLs in App Store Connect and verify them in the saved version record.
+- [x] Exact support, marketing and privacy URLs entered in the saved App Store version/localization record.
 
 ## App Store Connect
 
 - [ ] BLOCKED: accept agreements; complete tax/banking as required.
-- [ ] BLOCKED: create free 1-day Trial non-consumable and one-time Full Remote Unlock non-consumable using exact IDs.
-- [ ] BLOCKED: set localized IAP names/descriptions and storefront price; upload IAP review screenshot.
-- [ ] BLOCKED: reserve localized names; upload descriptions, keywords, privacy/terms URLs and signed-build screenshots.
-- [ ] BLOCKED: complete age-rating, content-rights, encryption/export-compliance and App Privacy questionnaires from current rules.
-- [ ] BLOCKED: submit products and binary together, then preserve the exact reviewer notes in `APP_STORE.md`.
+- [x] Free 1-day Trial and one-time Full Remote Unlock non-consumables created with exact product IDs.
+- [x] English, Spanish (Mexico) and French (Canada) IAP names/descriptions configured; lifetime unlock set to US $2.99.
+- [ ] BLOCKED: attach the required IAP review screenshot; both products remain `MISSING_METADATA` until review media is complete.
+- [x] English app name/subtitle, description, keywords, promotional text and URLs saved in App Store Connect.
+- [ ] BLOCKED: attach the reviewed iPhone/iPad screenshot set to the App Store version.
+- [x] Age rating, content rights and export-compliance build declaration completed from current source.
+- [ ] BLOCKED: complete/verify the App Privacy questionnaire in the publisher UI against the final binary.
+- [x] Processed build `2609081633.5` selected on the version; manual release and reviewer details/notes saved.
+- [ ] BLOCKED: add the Account Holder to `TV Remote Control Internal Testers` in App Store Connect; the build is already assigned to that group.
+- [ ] INTENTIONAL: do not submit the products or app version for App Store review until the publisher explicitly authorizes submission.
