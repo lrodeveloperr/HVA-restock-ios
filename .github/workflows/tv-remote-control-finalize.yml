@@ -1,0 +1,347 @@
+name: Finalize TV Remote Control App Store Record
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/tv-remote-control-finalize.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tv-remote-control-app-store-finalize
+  cancel-in-progress: false
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+      APP_ID: "6809810611"
+      BUILD_NUMBER: "2609081633.5"
+    steps:
+      - name: Finalize non-media App Store fields
+        shell: bash
+        run: |
+          set -euo pipefail
+          for key in ASC_KEY_ID ASC_ISSUER_ID ASC_PRIVATE_KEY; do
+            [[ -n "${!key:-}" ]] || { echo "Missing protected $key input." >&2; exit 1; }
+          done
+          key_path="$RUNNER_TEMP/AuthKey_$ASC_KEY_ID.p8"
+          printf '%s' "$ASC_PRIVATE_KEY" > "$key_path"
+          chmod 600 "$key_path"
+          export ASC_KEY_PATH="$key_path"
+
+          ruby <<'RUBY'
+          require "base64"
+          require "json"
+          require "net/http"
+          require "openssl"
+          require "uri"
+
+          APP_ID = ENV.fetch("APP_ID")
+          BUILD_NUMBER = ENV.fetch("BUILD_NUMBER")
+          KEY_ID = ENV.fetch("ASC_KEY_ID")
+          ISSUER_ID = ENV.fetch("ASC_ISSUER_ID")
+          KEY_PATH = ENV.fetch("ASC_KEY_PATH")
+
+          def base64url(value)
+            Base64.urlsafe_encode64(value, padding: false)
+          end
+
+          issued_at = Time.now.to_i
+          header = { alg: "ES256", kid: KEY_ID, typ: "JWT" }
+          payload = { iss: ISSUER_ID, iat: issued_at, exp: issued_at + 1_200, aud: "appstoreconnect-v1" }
+          signing_input = [header, payload].map { |value| base64url(JSON.generate(value)) }.join(".")
+          private_key = OpenSSL::PKey.read(File.binread(KEY_PATH))
+          components = OpenSSL::ASN1.decode(private_key.sign(OpenSSL::Digest::SHA256.new, signing_input)).value
+          raw_signature = components.map do |component|
+            hex = component.value.to_i.to_s(16)
+            [hex.rjust(64, "0")].pack("H*")
+          end.join
+          JWT = "#{signing_input}.#{base64url(raw_signature)}"
+
+          def query_path(path, params)
+            uri = URI(path)
+            uri.query = URI.encode_www_form(params)
+            uri.to_s
+          end
+
+          def request(method, path, body: nil, allowed: [200])
+            uri = URI("https://api.appstoreconnect.apple.com#{path}")
+            request_class = {
+              get: Net::HTTP::Get,
+              post: Net::HTTP::Post,
+              patch: Net::HTTP::Patch,
+            }.fetch(method)
+            req = request_class.new(uri)
+            req["Authorization"] = "Bearer #{JWT}"
+            req["Accept"] = "application/json"
+            if body
+              req["Content-Type"] = "application/json"
+              req.body = JSON.generate(body)
+            end
+            response = Net::HTTP.start(uri.host, uri.port, use_ssl: true, open_timeout: 15, read_timeout: 60) do |http|
+              http.request(req)
+            end
+            unless allowed.include?(response.code.to_i)
+              detail = begin
+                JSON.parse(response.body.to_s).fetch("errors", []).map do |error|
+                  [error["code"], error["title"], error["detail"]].compact.join(": ")
+                end.join(" | ")
+              rescue JSON::ParserError
+                "Apple returned a non-JSON error."
+              end
+              abort "App Store Connect #{method.upcase} #{uri.path} failed (HTTP #{response.code}): #{detail.byteslice(0, 900)}"
+            end
+            document = response.body.to_s.strip.empty? ? {} : JSON.parse(response.body)
+            [response.code.to_i, document]
+          end
+
+          english_description = <<~TEXT
+            Control a compatible Vizio SmartCast television from your iPhone or iPad over your local network.
+
+            TV Remote Control keeps the interface focused on everyday controls: navigation, volume, channels, input selection, playback and basic text entry. Use automatic discovery when available or enter the TV's local IPv4 address manually.
+
+            FEATURES
+
+            • Direction pad with a large OK button
+            • Volume, mute and channel controls
+            • Home, back, menu and input controls
+            • Separate Play and Pause controls (availability varies by TV app and firmware)
+            • Basic Latin keyboard entry
+            • Manual IP fallback
+            • Built-in Demo TV for exploring the interface
+
+            TRY IT, THEN PAY ONCE
+
+            Start the free 1-day Trial to use every remote feature for 24 hours. Access stops when the trial ends. The trial does not renew and you will not be charged automatically. Keep access with the optional one-time Full Remote Unlock. The App Store shows the price before confirmation. There are no subscriptions.
+
+            PRIVATE BY DESIGN
+
+            • No separate app account
+            • No advertising or analytics SDKs
+            • No developer-operated cloud service
+            • Commands travel directly between this device and the selected television
+            • Selected-TV metadata, pairing token and saved TV certificate identity use the device-only iOS Keychain
+
+            COMPATIBILITY
+
+            Requires a compatible Vizio SmartCast television and a working local network. Firmware, model, network isolation and power settings can affect availability. Power-on is not guaranteed when the TV is unreachable. IPv6-only networks are not currently supported; the TV must expose a private IPv4 address. Legacy Vizio Internet Apps televisions are not supported.
+
+            TV Remote Control is an independent application and is not affiliated with or endorsed by Vizio, Inc. Vizio and SmartCast are trademarks of their owner and are used only to describe compatibility.
+          TEXT
+
+          review_notes = <<~TEXT
+            This app controls compatible televisions directly over the local network and includes a complete hardware-independent Demo TV for review.
+
+            1. Acquire the free 1-day Trial with the sandbox account. It unlocks all features for 24 hours, does not renew, and creates no automatic charge.
+            2. Tap Try Demo TV.
+            3. Enter PIN 1234.
+            4. Exercise remote buttons and basic text entry.
+            5. Open Settings to test Restore Purchases, Forget This TV, and Remove All Saved TV Data.
+
+            The optional Full Remote Unlock is a separate one-time non-consumable. There are no subscriptions, ads, separate app accounts, analytics, or backend servers. Automatic discovery uses SSDP multicast; manual private-IPv4 entry is available. The app is independent and is not affiliated with or endorsed by Vizio, Inc.
+          TEXT
+
+          _, versions_doc = request(
+            :get,
+            query_path("/v1/apps/#{APP_ID}/appStoreVersions", { "filter[platform]" => "IOS", "limit" => "200" }),
+          )
+          versions = versions_doc.fetch("data", [])
+          version = versions.find do |item|
+            item.dig("attributes", "versionString") == "1.0" && item.dig("attributes", "appStoreState") != "READY_FOR_SALE"
+          end || versions.find { |item| item.dig("attributes", "versionString") == "1.0" }
+          abort "Editable App Store version 1.0 was not found." unless version
+          version_id = version.fetch("id")
+
+          _, infos_doc = request(:get, "/v1/apps/#{APP_ID}/appInfos?limit=200")
+          app_info = infos_doc.fetch("data", []).find do |item|
+            item.dig("attributes", "appStoreState") != "READY_FOR_SALE"
+          end || infos_doc.fetch("data", []).first
+          abort "Editable app information record was not found." unless app_info
+          app_info_id = app_info.fetch("id")
+
+          _, info_locs_doc = request(:get, "/v1/appInfos/#{app_info_id}/appInfoLocalizations?limit=200")
+          info_locs = info_locs_doc.fetch("data", [])
+          info_attributes = {
+            name: "TV Remote Control: Simple",
+            subtitle: "Simple Wi-Fi Controls",
+            privacyPolicyUrl: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/privacy/",
+          }
+          english_info = info_locs.find { |item| item.dig("attributes", "locale") == "en-US" }
+          if english_info
+            request(:patch, "/v1/appInfoLocalizations/#{english_info.fetch("id")}", body: {
+              data: { type: "appInfoLocalizations", id: english_info.fetch("id"), attributes: info_attributes },
+            })
+          else
+            request(:post, "/v1/appInfoLocalizations", body: {
+              data: {
+                type: "appInfoLocalizations",
+                attributes: info_attributes.merge(locale: "en-US"),
+                relationships: { appInfo: { data: { type: "appInfos", id: app_info_id } } },
+              },
+            }, allowed: [201])
+          end
+
+          _, version_locs_doc = request(:get, "/v1/appStoreVersions/#{version_id}/appStoreVersionLocalizations?limit=200")
+          version_locs = version_locs_doc.fetch("data", [])
+          version_attributes = {
+            description: english_description,
+            keywords: "controller,volume,keyboard,input,channel,navigation,media,smart television",
+            marketingUrl: "https://worksbienstudios.com/apps/tv-remote-control",
+            promotionalText: "Try every remote feature free for one day, then keep access with one optional purchase. No ads, separate app account or subscription.",
+            supportUrl: "https://worksbienstudios.com/customerservice",
+          }
+          english_version = version_locs.find { |item| item.dig("attributes", "locale") == "en-US" }
+          if english_version
+            request(:patch, "/v1/appStoreVersionLocalizations/#{english_version.fetch("id")}", body: {
+              data: { type: "appStoreVersionLocalizations", id: english_version.fetch("id"), attributes: version_attributes },
+            })
+          else
+            request(:post, "/v1/appStoreVersionLocalizations", body: {
+              data: {
+                type: "appStoreVersionLocalizations",
+                attributes: version_attributes.merge(locale: "en-US"),
+                relationships: { appStoreVersion: { data: { type: "appStoreVersions", id: version_id } } },
+              },
+            }, allowed: [201])
+          end
+
+          request(:patch, "/v1/appStoreVersions/#{version_id}", body: {
+            data: {
+              type: "appStoreVersions",
+              id: version_id,
+              attributes: { copyright: "2026 WorksBien Studios Inc.", releaseType: "MANUAL" },
+            },
+          })
+
+          _, categories_doc = request(
+            :get,
+            query_path("/v1/appCategories", { "filter[platforms]" => "IOS", "limit" => "200" }),
+          )
+          categories = categories_doc.fetch("data", [])
+          utilities = categories.find do |item|
+            item.fetch("id").upcase == "UTILITIES" || item.dig("attributes", "name").to_s.casecmp?("Utilities")
+          end
+          entertainment = categories.find do |item|
+            item.fetch("id").upcase == "ENTERTAINMENT" || item.dig("attributes", "name").to_s.casecmp?("Entertainment")
+          end
+          abort "Utilities or Entertainment App Store category was not found." unless utilities && entertainment
+          request(:patch, "/v1/appInfos/#{app_info_id}", body: {
+            data: {
+              type: "appInfos",
+              id: app_info_id,
+              relationships: {
+                primaryCategory: { data: { type: "appCategories", id: utilities.fetch("id") } },
+                secondaryCategory: { data: { type: "appCategories", id: entertainment.fetch("id") } },
+              },
+            },
+          })
+
+          request(:patch, "/v1/apps/#{APP_ID}", body: {
+            data: {
+              type: "apps",
+              id: APP_ID,
+              attributes: { contentRightsDeclaration: "DOES_NOT_USE_THIRD_PARTY_CONTENT" },
+            },
+          })
+
+          _, rating_doc = request(:get, "/v1/apps/#{APP_ID}/ageRatingDeclaration")
+          rating = rating_doc.fetch("data")
+          enum_fields = %w[
+            alcoholTobaccoOrDrugUseOrReferences contests gamblingSimulated gunsOrOtherWeapons
+            horrorOrFearThemes matureOrSuggestiveThemes medicalOrTreatmentInformation
+            profanityOrCrudeHumor sexualContentGraphicAndNudity sexualContentOrNudity
+            violenceCartoonOrFantasy violenceRealisticProlongedGraphicOrSadistic violenceRealistic
+          ]
+          rating_attributes = rating.fetch("attributes", {}).each_with_object({}) do |(key, value), result|
+            if enum_fields.include?(key)
+              result[key] = "NONE"
+            elsif value == true || value == false
+              result[key] = false
+            end
+          end
+          request(:patch, "/v1/ageRatingDeclarations/#{rating.fetch("id")}", body: {
+            data: { type: "ageRatingDeclarations", id: rating.fetch("id"), attributes: rating_attributes },
+          })
+
+          _, apps_doc = request(:get, "/v1/apps?limit=200")
+          other_apps = apps_doc.fetch("data", []).reject { |item| item.fetch("id") == APP_ID }
+          welding_candidates = other_apps.select do |item|
+            item.dig("attributes", "name").to_s.downcase.include?("weld")
+          end
+          source_app = welding_candidates.find do |item|
+            item.dig("attributes", "name").to_s.casecmp?("Welding Gas Wallet")
+          end || (welding_candidates.length == 1 ? welding_candidates.first : nil)
+          abort "Could not resolve the Welding app uniquely for review-contact reuse." unless source_app
+
+          _, source_versions_doc = request(
+            :get,
+            query_path("/v1/apps/#{source_app.fetch("id")}/appStoreVersions", { "filter[platform]" => "IOS", "limit" => "200" }),
+          )
+          source_review = nil
+          source_versions_doc.fetch("data", []).each do |source_version|
+            status, detail_doc = request(
+              :get,
+              "/v1/appStoreVersions/#{source_version.fetch("id")}/appStoreReviewDetail",
+              allowed: [200, 404],
+            )
+            next unless status == 200 && detail_doc["data"]
+            source_review = detail_doc.fetch("data")
+            break
+          end
+          abort "The Welding app has no reusable App Review contact record." unless source_review
+          contact_fields = %w[contactFirstName contactLastName contactPhone contactEmail]
+          contact_attributes = source_review.fetch("attributes", {}).select { |key, _| contact_fields.include?(key) }
+          abort "The Welding app App Review contact record is incomplete." unless contact_attributes.length == contact_fields.length
+          review_attributes = contact_attributes.merge(
+            "demoAccountRequired" => false,
+            "demoAccountName" => nil,
+            "demoAccountPassword" => nil,
+            "notes" => review_notes,
+          )
+
+          review_status, target_review_doc = request(
+            :get,
+            "/v1/appStoreVersions/#{version_id}/appStoreReviewDetail",
+            allowed: [200, 404],
+          )
+          if review_status == 200 && target_review_doc["data"]
+            review_id = target_review_doc.fetch("data").fetch("id")
+            request(:patch, "/v1/appStoreReviewDetails/#{review_id}", body: {
+              data: { type: "appStoreReviewDetails", id: review_id, attributes: review_attributes },
+            })
+          else
+            request(:post, "/v1/appStoreReviewDetails", body: {
+              data: {
+                type: "appStoreReviewDetails",
+                attributes: review_attributes,
+                relationships: { appStoreVersion: { data: { type: "appStoreVersions", id: version_id } } },
+              },
+            }, allowed: [201])
+          end
+
+          _, builds_doc = request(
+            :get,
+            query_path(
+              "/v1/builds",
+              { "filter[app]" => APP_ID, "filter[version]" => BUILD_NUMBER, "limit" => "10" },
+            ),
+          )
+          build = builds_doc.fetch("data", []).find do |item|
+            item.dig("attributes", "processingState") == "VALID"
+          end
+          abort "Processed build #{BUILD_NUMBER} was not found." unless build
+          request(:patch, "/v1/appStoreVersions/#{version_id}/relationships/build", body: {
+            data: { type: "builds", id: build.fetch("id") },
+          }, allowed: [204])
+
+          puts "Finalized English metadata, categories, age rating, content rights, copyright, manual release, App Review details, and build #{BUILD_NUMBER}."
+          puts "No App Store review submission was created."
+          RUBY
