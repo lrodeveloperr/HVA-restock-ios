@@ -1,0 +1,213 @@
+name: Configure TV Remote Control Purchases
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/tv-remote-control-iap.yml
+
+permissions:
+  contents: read
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: lrodeveloperr/HVA-restock-ios
+          ref: release/tv-remote-control
+      - name: Configure one-time purchases
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -n "$ASC_KEY_ID" ]] || missing+=(ASC_KEY_ID)
+          [[ -n "$ASC_ISSUER_ID" ]] || missing+=(ASC_ISSUER_ID)
+          [[ -n "$ASC_PRIVATE_KEY" ]] || missing+=(ASC_PRIVATE_KEY)
+          (( ${#missing[@]} == 0 )) || { echo "Missing Actions secrets: ${missing[*]}" >&2; exit 1; }
+
+          key_path="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          umask 077
+          printf '%s' "$ASC_PRIVATE_KEY" > "$key_path"
+          export ASC_TOKEN="$(ruby Scripts/app-store-connect-jwt.rb "$key_path" "$ASC_KEY_ID" "$ASC_ISSUER_ID")"
+
+          ruby <<'RUBY'
+          require "json"
+          require "net/http"
+          require "uri"
+
+          APP_ID = "6809810611"
+          TRIAL_PRODUCT_ID = "com.worksbienstudios.clearmote.trial.1day"
+          LIFETIME_PRODUCT_ID = "com.worksbienstudios.clearmote.lifetime"
+
+          PRODUCTS = {
+            TRIAL_PRODUCT_ID => {
+              reference_name: "1-day Trial",
+              review_note: "Free non-consumable trial. Unlocks full remote controls for 24 hours from the original purchase date. It never auto-renews and never charges automatically. After 24 hours, controls lock until a lifetime unlock is purchased.",
+              localizations: {
+                "en-US" => ["1-Day Trial", "24-hour full access. No automatic charge."],
+                "es-MX" => ["Prueba de 1 día", "Acceso total 24 h. Sin cargos automáticos."],
+                "fr-CA" => ["Essai de 1 jour", "Accès complet 24 h. Aucun frais automatique."]
+              }
+            },
+            LIFETIME_PRODUCT_ID => {
+              reference_name: "Full Remote Unlock",
+              review_note: "One-time non-consumable purchase. Permanently unlocks all remote-control features. It is not a subscription and does not expire.",
+              localizations: {
+                "en-US" => ["Full Remote Unlock", "All remote features with one purchase."],
+                "es-MX" => ["Desbloqueo completo", "Todas las funciones con una compra única."],
+                "fr-CA" => ["Déverrouillage complet", "Toutes les fonctions, un seul achat."]
+              }
+            }
+          }.freeze
+
+          def request(method, path, body = nil)
+            uri = URI("https://api.appstoreconnect.apple.com#{path}")
+            klass = {
+              get: Net::HTTP::Get,
+              post: Net::HTTP::Post,
+              patch: Net::HTTP::Patch
+            }.fetch(method)
+            req = klass.new(uri)
+            req["Authorization"] = "Bearer #{ENV.fetch("ASC_TOKEN")}" 
+            req["Content-Type"] = "application/json"
+            req["Accept"] = "application/json"
+            req.body = JSON.generate(body) if body
+            response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
+            unless response.code.to_i.between?(200, 299)
+              abort "#{method.to_s.upcase} #{path} failed (#{response.code}): #{response.body}"
+            end
+            response.body.nil? || response.body.empty? ? {} : JSON.parse(response.body)
+          end
+
+          def find_or_create_product(product_id, config)
+            list = request(:get, "/v1/apps/#{APP_ID}/inAppPurchasesV2?limit=200").fetch("data")
+            product = list.find { |item| item.dig("attributes", "productId") == product_id }
+            unless product
+              payload = {
+                data: {
+                  type: "inAppPurchases",
+                  attributes: {
+                    name: config.fetch(:reference_name),
+                    productId: product_id,
+                    inAppPurchaseType: "NON_CONSUMABLE",
+                    reviewNote: config.fetch(:review_note),
+                    familySharable: false
+                  },
+                  relationships: { app: { data: { type: "apps", id: APP_ID } } }
+                }
+              }
+              product = request(:post, "/v2/inAppPurchases", payload).fetch("data")
+              puts "Created #{product_id} as #{product.fetch("id")}" 
+            end
+
+            id = product.fetch("id")
+            request(:patch, "/v2/inAppPurchases/#{id}", {
+              data: {
+                type: "inAppPurchases",
+                id: id,
+                attributes: {
+                  name: config.fetch(:reference_name),
+                  reviewNote: config.fetch(:review_note),
+                  familySharable: false
+                }
+              }
+            })
+            id
+          end
+
+          def upsert_localizations(iap_id, localizations)
+            existing = request(:get, "/v2/inAppPurchases/#{iap_id}/inAppPurchaseLocalizations?limit=200").fetch("data")
+            localizations.each do |locale, values|
+              name, description = values
+              current = existing.find { |item| item.dig("attributes", "locale") == locale }
+              if current
+                request(:patch, "/v1/inAppPurchaseLocalizations/#{current.fetch("id")}", {
+                  data: {
+                    type: "inAppPurchaseLocalizations",
+                    id: current.fetch("id"),
+                    attributes: { name: name, description: description }
+                  }
+                })
+              else
+                request(:post, "/v1/inAppPurchaseLocalizations", {
+                  data: {
+                    type: "inAppPurchaseLocalizations",
+                    attributes: { locale: locale, name: name, description: description },
+                    relationships: {
+                      inAppPurchaseV2: { data: { type: "inAppPurchases", id: iap_id } }
+                    }
+                  }
+                })
+              end
+              puts "Configured #{locale} metadata for #{iap_id}"
+            end
+          end
+
+          def set_all_territories(iap_id, territories)
+            request(:post, "/v1/inAppPurchaseAvailabilities", {
+              data: {
+                type: "inAppPurchaseAvailabilities",
+                attributes: { availableInNewTerritories: true },
+                relationships: {
+                  inAppPurchase: { data: { type: "inAppPurchases", id: iap_id } },
+                  availableTerritories: {
+                    data: territories.map { |id| { type: "territories", id: id } }
+                  }
+                }
+              }
+            })
+            puts "Enabled #{territories.length} territories for #{iap_id}"
+          end
+
+          def set_lifetime_price(iap_id)
+            response = request(:get, "/v2/inAppPurchases/#{iap_id}/pricePoints?filter%5Bterritory%5D=USA&limit=8000")
+            price_point = response.fetch("data").find { |item| item.dig("attributes", "customerPrice") == "2.99" }
+            abort "No USA $2.99 price point found for #{iap_id}" unless price_point
+            price_point_id = price_point.fetch("id")
+            placeholder = "${price1}"
+            request(:post, "/v1/inAppPurchasePriceSchedules", {
+              data: {
+                type: "inAppPurchasePriceSchedules",
+                relationships: {
+                  inAppPurchase: { data: { type: "inAppPurchases", id: iap_id } },
+                  baseTerritory: { data: { type: "territories", id: "USA" } },
+                  manualPrices: { data: [{ type: "inAppPurchasePrices", id: placeholder }] }
+                }
+              },
+              included: [{
+                type: "inAppPurchasePrices",
+                id: placeholder,
+                attributes: { startDate: nil },
+                relationships: {
+                  inAppPurchaseV2: { data: { type: "inAppPurchases", id: iap_id } },
+                  inAppPurchasePricePoint: {
+                    data: { type: "inAppPurchasePricePoints", id: price_point_id }
+                  }
+                }
+              }]
+            })
+            puts "Set USA base price to $2.99 for #{iap_id}"
+          end
+
+          territories = request(:get, "/v1/territories?limit=200").fetch("data").map { |item| item.fetch("id") }
+          abort "Expected a complete territory catalog, found #{territories.length}" if territories.length < 170
+
+          ids = {}
+          PRODUCTS.each do |product_id, config|
+            ids[product_id] = find_or_create_product(product_id, config)
+            upsert_localizations(ids.fetch(product_id), config.fetch(:localizations))
+            set_all_territories(ids.fetch(product_id), territories)
+          end
+          set_lifetime_price(ids.fetch(LIFETIME_PRODUCT_ID))
+
+          final = request(:get, "/v1/apps/#{APP_ID}/inAppPurchasesV2?limit=200").fetch("data")
+          final.select { |item| PRODUCTS.key?(item.dig("attributes", "productId")) }.each do |item|
+            attributes = item.fetch("attributes")
+            puts "productId=#{attributes.fetch("productId")} state=#{attributes.fetch("state")} iapId=#{item.fetch("id")}" 
+          end
+          RUBY
