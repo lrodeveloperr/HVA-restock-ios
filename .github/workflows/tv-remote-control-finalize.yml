@@ -23,7 +23,7 @@ jobs:
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
       ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
       APP_ID: "6809810611"
-      BUILD_NUMBER: "2609081633.5"
+      BUILD_NUMBER: "2609081841.8"
     steps:
       - name: Finalize non-media App Store fields
         shell: bash
