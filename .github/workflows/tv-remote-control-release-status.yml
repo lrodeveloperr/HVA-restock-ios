@@ -1,0 +1,55 @@
+name: TV Remote Control Release Status
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/tv-remote-control-release-status.yml
+
+permissions:
+  contents: read
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: lrodeveloperr/HVA-restock-ios
+          ref: release/tv-remote-control
+      - name: Query App Store Connect
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -n "$ASC_KEY_ID" ]] || missing+=(ASC_KEY_ID)
+          [[ -n "$ASC_ISSUER_ID" ]] || missing+=(ASC_ISSUER_ID)
+          [[ -n "$ASC_PRIVATE_KEY" ]] || missing+=(ASC_PRIVATE_KEY)
+          (( ${#missing[@]} == 0 )) || { echo "Missing Actions secrets: ${missing[*]}" >&2; exit 1; }
+          key_path="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          umask 077
+          printf '%s' "$ASC_PRIVATE_KEY" > "$key_path"
+          jwt="$(ruby Scripts/app-store-connect-jwt.rb "$key_path" "$ASC_KEY_ID" "$ASC_ISSUER_ID")"
+          auth="Authorization: Bearer $jwt"
+          response="$RUNNER_TEMP/builds.json"
+          curl --fail-with-body --silent --show-error --get -H "$auth" \
+            --data-urlencode 'filter[app]=6809810611' \
+            --data-urlencode 'sort=-uploadedDate' \
+            --data-urlencode 'limit=5' \
+            'https://api.appstoreconnect.apple.com/v1/builds' -o "$response"
+          ruby -rjson -e '
+            builds=JSON.parse(File.read(ARGV[0])).fetch("data")
+            abort "No TestFlight builds found yet" if builds.empty?
+            builds.each do |build|
+              a=build.fetch("attributes")
+              puts [
+                "build=#{a["version"]}",
+                "uploaded=#{a["uploadedDate"]}",
+                "expired=#{a["expired"]}",
+                "processingState=#{a["processingState"]}"
+              ].join(" ")
+            end
+          ' "$response"
