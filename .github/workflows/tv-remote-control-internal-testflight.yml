@@ -238,6 +238,10 @@ jobs:
             ),
           ).fetch("data", [])
           abort "No internal TestFlight beta-tester identity exists for the resolved Account Holder." if beta_testers.empty?
+          beta_tester_attributes = beta_testers.first.fetch("attributes", {}).reject do |key, _|
+            %w[email firstName lastName].include?(key)
+          end
+          puts "Resolved beta tester state: #{JSON.generate(beta_tester_attributes)}"
           tester_id = beta_testers.first.fetch("id")
 
           group_builds = api_request(
