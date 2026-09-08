@@ -171,18 +171,18 @@ jobs:
           info_locs = info_locs_doc.fetch("data", [])
           info_by_locale = {
             "en-US" => {
-              name: "Vizio Smart TV Remote Control",
-              subtitle: "WiFi, Volume & Keyboard",
+              name: "Remote Control for Vizio TV",
+              subtitle: "WiFi Keyboard, Volume & More",
               privacyPolicyUrl: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/privacy/",
             },
             "es-MX" => {
-              name: "Control Remoto Vizio Smart TV",
-              subtitle: "WiFi, Volumen y Teclado",
+              name: "Control Remoto para TV Vizio",
+              subtitle: "Teclado WiFi, Volumen y Más",
               privacyPolicyUrl: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/privacy/",
             },
             "fr-CA" => {
-              name: "Télécommande Vizio Smart TV",
-              subtitle: "WiFi, Volume et Clavier",
+              name: "Télécommande pour TV Vizio",
+              subtitle: "Clavier WiFi, Volume et Plus",
               privacyPolicyUrl: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/privacy/",
             },
           }
@@ -207,7 +207,7 @@ jobs:
           version_locs = version_locs_doc.fetch("data", [])
           version_attributes = {
             description: english_description,
-            keywords: "input,channel,navigation,media,power,dpad,buttons,pairing",
+            keywords: "smart,input,channel,navigation,media,power,dpad,buttons,pairing",
             marketingUrl: "https://worksbienstudios.com/apps/tv-remote-control",
             promotionalText: "Try every remote feature free for one day, then keep access with one optional purchase. No ads, separate app account or subscription.",
             supportUrl: "https://worksbienstudios.com/customerservice",
