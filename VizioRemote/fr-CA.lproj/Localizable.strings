@@ -144,6 +144,7 @@
 "This purchase is pending approval. Access will update automatically when it completes." = "Cet achat est en attente d’approbation. L’accès sera mis à jour automatiquement une fois l’achat terminé.";
 "The purchase did not complete. Please try again." = "L’achat n’a pas été effectué. Veuillez réessayer.";
 "The App Store returned an unexpected purchase. Nothing was unlocked." = "L’App Store a retourné un achat inattendu. Aucun accès n’a été déverrouillé.";
+"The one-time unlock price is temporarily unavailable. Please try again later." = "Le prix du déverrouillage à achat unique est temporairement indisponible. Réessayez plus tard.";
 "Your 1-day trial is active" = "Votre essai de 1 jour est actif";
 "Trial access ends %@. It does not renew and you will not be charged automatically. The optional one-time unlock costs %@." = "L’accès d’essai prend fin %@. Il ne se renouvelle pas et aucuns frais ne vous seront facturés automatiquement. Le déverrouillage unique facultatif coûte %@.";
 "The TV security identity changed. If you replaced or updated the TV, reset its saved security identity before pairing again." = "L’identité de sécurité du téléviseur a changé. Si vous avez remplacé ou mis à jour le téléviseur, réinitialisez son identité enregistrée avant de le jumeler de nouveau.";

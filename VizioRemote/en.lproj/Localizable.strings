@@ -144,6 +144,7 @@
 "This purchase is pending approval. Access will update automatically when it completes." = "This purchase is pending approval. Access will update automatically when it completes.";
 "The purchase did not complete. Please try again." = "The purchase did not complete. Please try again.";
 "The App Store returned an unexpected purchase. Nothing was unlocked." = "The App Store returned an unexpected purchase. Nothing was unlocked.";
+"The one-time unlock price is temporarily unavailable. Please try again later." = "The one-time unlock price is temporarily unavailable. Please try again later.";
 "Your 1-day trial is active" = "Your 1-day trial is active";
 "Trial access ends %@. It does not renew and you will not be charged automatically. The optional one-time unlock costs %@." = "Trial access ends %@. It does not renew and you will not be charged automatically. The optional one-time unlock costs %@.";
 "The TV security identity changed. If you replaced or updated the TV, reset its saved security identity before pairing again." = "The TV security identity changed. If you replaced or updated the TV, reset its saved security identity before pairing again.";

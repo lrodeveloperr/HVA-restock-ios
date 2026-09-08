@@ -22,10 +22,14 @@ enum AccessState: Equatable {
 
 enum TrialAccessPolicy {
     static let duration: TimeInterval = 24 * 60 * 60
+    static let maximumClockSkew: TimeInterval = 5 * 60
 
     static func state(purchaseDate: Date?, lifetimeUnlocked: Bool, now: Date) -> AccessState {
         if lifetimeUnlocked { return .lifetimeUnlocked }
         guard let purchaseDate else { return .trialAvailable }
+        guard purchaseDate.timeIntervalSince(now) <= maximumClockSkew else {
+            return .verificationFailed
+        }
 
         let end = purchaseDate.addingTimeInterval(duration)
         return now < end ? .trialActive(endsAt: end) : .trialExpired
@@ -130,16 +134,16 @@ final class PurchaseManager: ObservableObject {
             errorMessage = String(localized: "The 1-day trial is temporarily unavailable.")
             return
         }
+        guard lifetimeProduct != nil else {
+            errorMessage = String(localized: "The one-time unlock price is temporarily unavailable. Please try again later.")
+            return
+        }
         await purchase(trialProduct)
     }
 
     func buyLifetime() async {
         errorMessage = nil
         if accessState == .lifetimeUnlocked { return }
-        guard accessState != .verificationFailed else {
-            errorMessage = String(localized: "Resolve purchase verification with Restore Purchases or Apple Support before buying again.")
-            return
-        }
         guard let lifetimeProduct else {
             errorMessage = String(localized: "The one-time unlock is temporarily unavailable.")
             return
@@ -180,8 +184,8 @@ final class PurchaseManager: ObservableObject {
                 case Self.lifetimeProductID:
                     lifetimeUnlocked = true
                 case Self.trialProductID:
-                    if trialPurchaseDate == nil || transaction.purchaseDate < trialPurchaseDate! {
-                        trialPurchaseDate = transaction.purchaseDate
+                    if trialPurchaseDate == nil || transaction.originalPurchaseDate < trialPurchaseDate! {
+                        trialPurchaseDate = transaction.originalPurchaseDate
                     }
                 default:
                     continue
@@ -215,6 +219,7 @@ final class PurchaseManager: ObservableObject {
             switch result {
             case .success(let verification):
                 guard case .verified(let transaction) = verification else {
+                    await refreshEntitlements()
                     errorMessage = String(localized: "The App Store could not verify this purchase.")
                     return
                 }
@@ -223,6 +228,7 @@ final class PurchaseManager: ObservableObject {
                     errorMessage = String(localized: "The App Store returned an unexpected purchase. Nothing was unlocked.")
                     return
                 }
+                deliver(transaction)
                 await transaction.finish()
                 await refreshEntitlements()
                 errorMessage = nil
@@ -246,6 +252,11 @@ final class PurchaseManager: ObservableObject {
         case .verified(let transaction):
             guard transaction.productType == .nonConsumable,
                   transaction.productID == Self.trialProductID || transaction.productID == Self.lifetimeProductID else { return }
+            if transaction.revocationDate == nil {
+                deliver(transaction)
+            } else {
+                await refreshEntitlements()
+            }
             await transaction.finish()
             await refreshEntitlements()
             errorMessage = nil
@@ -257,6 +268,23 @@ final class PurchaseManager: ObservableObject {
                 ? String(localized: "The App Store could not verify this purchase.")
                 : String(localized: "An App Store purchase could not be verified. Remote access remains locked. Try Restore Purchases or contact Apple Support.")
         }
+    }
+
+    private func deliver(_ transaction: Transaction) {
+        switch transaction.productID {
+        case Self.lifetimeProductID:
+            accessState = .lifetimeUnlocked
+        case Self.trialProductID where accessState != .lifetimeUnlocked:
+            accessState = TrialAccessPolicy.state(
+                purchaseDate: transaction.originalPurchaseDate,
+                lifetimeUnlocked: false,
+                now: now()
+            )
+        default:
+            return
+        }
+        scheduleTrialExpiryIfNeeded()
+        if accessState.grantsRemoteAccess { showPurchaseSheet = false }
     }
 
     private func scheduleTrialExpiryIfNeeded() {

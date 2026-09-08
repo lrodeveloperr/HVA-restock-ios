@@ -144,6 +144,7 @@
 "This purchase is pending approval. Access will update automatically when it completes." = "Esta compra está pendiente de aprobación. El acceso se actualizará automáticamente cuando se complete.";
 "The purchase did not complete. Please try again." = "La compra no se completó. Inténtalo de nuevo.";
 "The App Store returned an unexpected purchase. Nothing was unlocked." = "App Store devolvió una compra inesperada. No se desbloqueó nada.";
+"The one-time unlock price is temporarily unavailable. Please try again later." = "El precio del desbloqueo de pago único no está disponible temporalmente. Vuelve a intentarlo más tarde.";
 "Your 1-day trial is active" = "Tu prueba de 1 día está activa";
 "Trial access ends %@. It does not renew and you will not be charged automatically. The optional one-time unlock costs %@." = "El acceso de prueba termina %@. No se renueva ni se te cobrará automáticamente. El desbloqueo opcional de pago único cuesta %@.";
 "The TV security identity changed. If you replaced or updated the TV, reset its saved security identity before pairing again." = "La identidad de seguridad de la TV cambió. Si reemplazaste o actualizaste la TV, restablece su identidad guardada antes de volver a vincularla.";

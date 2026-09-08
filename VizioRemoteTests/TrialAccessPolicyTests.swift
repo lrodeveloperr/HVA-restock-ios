@@ -35,6 +35,22 @@ final class TrialAccessPolicyTests: XCTestCase {
         )
     }
 
+    func testImplausibleFutureTrialDateFailsClosed() {
+        let futureDate = now.addingTimeInterval(TrialAccessPolicy.maximumClockSkew + 1)
+        XCTAssertEqual(
+            TrialAccessPolicy.state(purchaseDate: futureDate, lifetimeUnlocked: false, now: now),
+            .verificationFailed
+        )
+    }
+
+    func testSmallClockSkewDoesNotLockValidTrial() {
+        let futureDate = now.addingTimeInterval(TrialAccessPolicy.maximumClockSkew)
+        XCTAssertEqual(
+            TrialAccessPolicy.state(purchaseDate: futureDate, lifetimeUnlocked: false, now: now),
+            .trialActive(endsAt: futureDate.addingTimeInterval(TrialAccessPolicy.duration))
+        )
+    }
+
     func testUnverifiedOwnershipFailsClosedAfterVerifiedTrialExpires() {
         let purchaseDate = now.addingTimeInterval(-TrialAccessPolicy.duration)
         XCTAssertEqual(

@@ -45,10 +45,13 @@ struct PurchaseGateView: View {
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(PrimaryButtonStyle())
-                        .disabled(purchases.isWorking || purchases.isLoadingProducts || purchases.trialProduct == nil)
+                        .disabled(
+                            purchases.isWorking || purchases.isLoadingProducts ||
+                            purchases.trialProduct == nil || purchases.lifetimeProduct == nil
+                        )
                     }
 
-                    if purchases.accessState != .verificationFailed {
+                    if purchases.accessState != .lifetimeUnlocked {
                         Button {
                             Task { await purchases.buyLifetime() }
                         } label: {
@@ -140,7 +143,7 @@ struct PurchaseGateView: View {
 
     private var trialButtonTitle: String {
         let format = String(localized: "Start 1-day Trial · %@")
-        return String(format: format, purchases.trialProduct?.displayPrice ?? String(localized: "Free"))
+        return String(format: format, purchases.trialProduct?.displayPrice ?? "—")
     }
 
     private var lifetimeButtonTitle: String {
