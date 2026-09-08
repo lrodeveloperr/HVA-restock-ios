@@ -191,8 +191,7 @@ jobs:
           [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")" == "$IOS_BUNDLE_ID" ]]
           [[ "$(/usr/libexec/PlistBuddy -c 'Print :ITSAppUsesNonExemptEncryption' "$app/Info.plist")" == "false" ]]
           [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIconName' "$app/Info.plist")" == "AppIcon" ]]
-          [[ -f "$app/AppIcon60x60@2x.png" ]]
-          [[ -f "$app/AppIcon76x76@2x.png" ]]
+          [[ -f "$app/Assets.car" ]]
       - name: Validate and upload to TestFlight
         env:
           ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
