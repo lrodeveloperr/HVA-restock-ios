@@ -53,3 +53,22 @@ jobs:
               ].join(" ")
             end
           ' "$response"
+
+          iaps="$RUNNER_TEMP/iaps.json"
+          curl --fail-with-body --silent --show-error --get -H "$auth" \
+            --data-urlencode 'limit=200' \
+            'https://api.appstoreconnect.apple.com/v1/apps/6809810611/inAppPurchasesV2' -o "$iaps"
+          ruby -rjson -e '
+            items=JSON.parse(File.read(ARGV[0])).fetch("data")
+            puts "iapCount=#{items.length}"
+            items.each do |item|
+              a=item.fetch("attributes")
+              puts [
+                "iapId=#{item["id"]}",
+                "productId=#{a["productId"]}",
+                "type=#{a["inAppPurchaseType"]}",
+                "state=#{a["state"]}",
+                "referenceName=#{a["name"]}"
+              ].join(" ")
+            end
+          ' "$iaps"
