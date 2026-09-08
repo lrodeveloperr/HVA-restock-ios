@@ -45,7 +45,7 @@ jobs:
 
           LISTINGS = {
             "es-MX" => {
-              name: "Control remoto de TV",
+              name: "Control TV: Mando Simple",
               subtitle: "Controles Wi-Fi simples",
               privacy_url: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/es/privacy/",
               promotional_text: "Prueba todas las funciones gratis durante un día y conserva el acceso con una compra opcional. Sin anuncios, cuenta propia ni suscripción.",
@@ -84,7 +84,7 @@ jobs:
               TEXT
             },
             "fr-CA" => {
-              name: "Télécommande TV",
+              name: "Télécommande TV : Simple",
               subtitle: "Commandes Wi-Fi simples",
               privacy_url: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/fr-ca/privacy/",
               promotional_text: "Essayez toutes les fonctions gratuitement pendant un jour, puis gardez l’accès avec un achat facultatif. Sans publicité, compte distinct ni abonnement.",
