@@ -1,0 +1,125 @@
+name: Configure TV Remote App Price and Availability
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/tv-remote-control-app-commerce.yml
+
+permissions:
+  contents: read
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: lrodeveloperr/HVA-restock-ios
+          ref: release/tv-remote-control
+      - name: Make app free and globally available
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -n "$ASC_KEY_ID" ]] || missing+=(ASC_KEY_ID)
+          [[ -n "$ASC_ISSUER_ID" ]] || missing+=(ASC_ISSUER_ID)
+          [[ -n "$ASC_PRIVATE_KEY" ]] || missing+=(ASC_PRIVATE_KEY)
+          (( ${#missing[@]} == 0 )) || { echo "Missing Actions secrets: ${missing[*]}" >&2; exit 1; }
+          key_path="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          umask 077
+          printf '%s' "$ASC_PRIVATE_KEY" > "$key_path"
+          export ASC_TOKEN="$(ruby Scripts/app-store-connect-jwt.rb "$key_path" "$ASC_KEY_ID" "$ASC_ISSUER_ID")"
+
+          ruby <<'RUBY'
+          require "json"
+          require "net/http"
+          require "uri"
+
+          APP_ID = "6809810611"
+
+          def request(method, path, body = nil, allowed: 200..299)
+            uri = URI("https://api.appstoreconnect.apple.com#{path}")
+            klass = { get: Net::HTTP::Get, post: Net::HTTP::Post }.fetch(method)
+            req = klass.new(uri)
+            req["Authorization"] = "Bearer #{ENV.fetch("ASC_TOKEN")}" 
+            req["Content-Type"] = "application/json"
+            req["Accept"] = "application/json"
+            req.body = JSON.generate(body) if body
+            response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
+            unless allowed.include?(response.code.to_i)
+              abort "#{method.to_s.upcase} #{path} failed (#{response.code}): #{response.body}"
+            end
+            [response.code.to_i, response.body.nil? || response.body.empty? ? {} : JSON.parse(response.body)]
+          end
+
+          _, points_payload = request(:get, "/v1/apps/#{APP_ID}/appPricePoints?filter%5Bterritory%5D=USA&limit=8000")
+          free_point = points_payload.fetch("data").find do |item|
+            customer_price = item.dig("attributes", "customerPrice")
+            customer_price == "0" || customer_price == "0.00"
+          end
+          abort "No free USA app price point found" unless free_point
+          placeholder = "${price1}"
+          request(:post, "/v1/appPriceSchedules", {
+            data: {
+              type: "appPriceSchedules",
+              relationships: {
+                app: { data: { type: "apps", id: APP_ID } },
+                baseTerritory: { data: { type: "territories", id: "USA" } },
+                manualPrices: { data: [{ type: "appPrices", id: placeholder }] }
+              }
+            },
+            included: [{
+              type: "appPrices",
+              id: placeholder,
+              attributes: { startDate: nil },
+              relationships: {
+                appPricePoint: { data: { type: "appPricePoints", id: free_point.fetch("id") } }
+              }
+            }]
+          })
+          puts "Configured app as free with USA base territory"
+
+          availability_status, availability = request(
+            :get,
+            "/v1/apps/#{APP_ID}/appAvailabilityV2",
+            allowed: [200, 404]
+          )
+          if availability_status == 404
+            _, territories_payload = request(:get, "/v1/territories?limit=200")
+            territory_ids = territories_payload.fetch("data").map { |item| item.fetch("id") }
+            abort "Expected a complete territory catalog, found #{territory_ids.length}" if territory_ids.length < 170
+            linkages = []
+            included = []
+            territory_ids.each_with_index do |territory_id, index|
+              id = "${territory#{index + 1}}"
+              linkages << { type: "territoryAvailabilities", id: id }
+              included << {
+                type: "territoryAvailabilities",
+                id: id,
+                attributes: { available: true, preOrderEnabled: false },
+                relationships: {
+                  territory: { data: { type: "territories", id: territory_id } }
+                }
+              }
+            end
+            _, created = request(:post, "/v2/appAvailabilities", {
+              data: {
+                type: "appAvailabilities",
+                attributes: { availableInNewTerritories: true },
+                relationships: {
+                  app: { data: { type: "apps", id: APP_ID } },
+                  territoryAvailabilities: { data: linkages }
+                }
+              },
+              included: included
+            })
+            puts "Enabled #{territory_ids.length} app territories; availabilityId=#{created.fetch("data").fetch("id")}" 
+          else
+            item = availability.fetch("data")
+            puts "App availability already exists; availabilityId=#{item.fetch("id")}" 
+          end
+          RUBY
