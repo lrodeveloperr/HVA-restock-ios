@@ -228,11 +228,17 @@ jobs:
           end
           group_id = group.fetch("id")
 
-          # Internal beta groups accept App Store Connect team-user IDs as
-          # beta tester relationship identifiers. Creating an email-only
-          # betaTester resource produces an external tester and cannot be
-          # assigned to an internal group.
-          tester_id = users.first.fetch("id")
+          tester_email = user_attributes["username"] || user_attributes["email"]
+          abort "The resolved App Store Connect user has no tester identity." if tester_email.to_s.empty?
+          beta_testers = api_request(
+            :get,
+            query_path(
+              "/v1/betaTesters",
+              { "filter[email]" => tester_email, "limit" => "200" },
+            ),
+          ).fetch("data", [])
+          abort "No internal TestFlight beta-tester identity exists for the resolved Account Holder." if beta_testers.empty?
+          tester_id = beta_testers.first.fetch("id")
 
           group_builds = api_request(
             :get,
