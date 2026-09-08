@@ -14,11 +14,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
+  build-and-analyze:
     runs-on: macos-26
-    timeout-minutes: 45
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Select Xcode
         run: |
           if [[ -d /Applications/Xcode_26.6.app ]]; then
@@ -39,6 +39,7 @@ jobs:
             -configuration Debug \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             CODE_SIGNING_ALLOWED=NO \
             build
           xcodebuild \
@@ -47,8 +48,17 @@ jobs:
             -configuration Release \
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
             CODE_SIGNING_ALLOWED=NO \
             build
+      - name: Verify Release excludes screenshot harness
+        run: |
+          release_binary="$RUNNER_TEMP/DerivedData/Build/Products/Release-iphonesimulator/VizioRemote.app/VizioRemote"
+          test -f "$release_binary"
+          if rg --text 'SCREENSHOT_MODE|SCREENSHOT_TRIAL_PRICE|SCREENSHOT_LIFETIME_PRICE' "$release_binary"; then
+            echo 'Release binary contains DEBUG-only screenshot controls.' >&2
+            exit 1
+          fi
       - name: Analyze
         run: |
           xcodebuild \
@@ -59,21 +69,39 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO \
             analyze
-      - name: Run unit tests
+
+  unit-tests:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Select stable StoreKit test runtime
         run: |
-          DEVICE_ID="$(xcrun simctl list devices available -j | ruby -rjson -e '
-            devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
-            phone = devices.find { |d| d["isAvailable"] && d["name"].start_with?("iPhone") }
-            abort "No available iPhone simulator" unless phone
-            puts phone.fetch("udid")
-          ')"
-          xcrun simctl boot "$DEVICE_ID" 2>/dev/null || true
-          xcrun simctl bootstatus "$DEVICE_ID" -b
+          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+          xcodebuild -version
+          xcrun simctl list devices available
+      - name: Run unit tests
+        timeout-minutes: 20
+        run: |
           xcodebuild \
             -project VizioRemote.xcodeproj \
             -scheme VizioRemote \
             -configuration Debug \
-            -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5' \
+            -destination-timeout 300 \
             CODE_SIGNING_ALLOWED=NO \
             ENABLE_TESTABILITY=YES \
+            -parallel-testing-enabled NO \
+            -test-timeouts-enabled YES \
+            -default-test-execution-time-allowance 180 \
+            -maximum-test-execution-time-allowance 240 \
+            -resultBundlePath "$RUNNER_TEMP/VizioRemoteTests.xcresult" \
             test
+      - name: Preserve XCTest diagnostics
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: VizioRemoteTests-xcresult
+          path: ${{ runner.temp }}/VizioRemoteTests.xcresult
+          if-no-files-found: warn
+          retention-days: 14

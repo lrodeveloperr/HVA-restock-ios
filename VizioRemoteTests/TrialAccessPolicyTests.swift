@@ -57,7 +57,8 @@ final class TrialAccessPolicyTests: XCTestCase {
             EntitlementAccessPolicy.state(
                 trialPurchaseDate: purchaseDate,
                 lifetimeUnlocked: false,
-                ownedVerificationFailed: true,
+                trialVerificationFailed: true,
+                lifetimeVerificationFailed: false,
                 now: now
             ),
             .verificationFailed
@@ -70,7 +71,8 @@ final class TrialAccessPolicyTests: XCTestCase {
             EntitlementAccessPolicy.state(
                 trialPurchaseDate: purchaseDate,
                 lifetimeUnlocked: false,
-                ownedVerificationFailed: true,
+                trialVerificationFailed: false,
+                lifetimeVerificationFailed: true,
                 now: now
             ),
             .trialActive(endsAt: purchaseDate.addingTimeInterval(TrialAccessPolicy.duration))
@@ -82,10 +84,50 @@ final class TrialAccessPolicyTests: XCTestCase {
             EntitlementAccessPolicy.state(
                 trialPurchaseDate: nil,
                 lifetimeUnlocked: true,
-                ownedVerificationFailed: true,
+                trialVerificationFailed: true,
+                lifetimeVerificationFailed: false,
                 now: now
             ),
             .lifetimeUnlocked
+        )
+    }
+
+    func testTrialVerificationFailureDoesNotBecomeLifetimeFailure() {
+        XCTAssertEqual(
+            EntitlementAccessPolicy.state(
+                trialPurchaseDate: nil,
+                lifetimeUnlocked: false,
+                trialVerificationFailed: true,
+                lifetimeVerificationFailed: false,
+                now: now
+            ),
+            .verificationFailed
+        )
+    }
+
+    func testProductCatalogRequiresFreeTrialAndPaidLifetimeUnlock() {
+        XCTAssertTrue(ProductCatalogPolicy.isValid(trialPrice: .zero, lifetimePrice: 2.99))
+        XCTAssertFalse(ProductCatalogPolicy.isValid(trialPrice: 0.99, lifetimePrice: 2.99))
+        XCTAssertFalse(ProductCatalogPolicy.isValid(trialPrice: .zero, lifetimePrice: .zero))
+        XCTAssertFalse(ProductCatalogPolicy.isValid(trialPrice: nil, lifetimePrice: 2.99))
+        XCTAssertFalse(ProductCatalogPolicy.isValid(trialPrice: .zero, lifetimePrice: nil))
+    }
+
+    func testLifetimePurchaseRemainsAvailableForTrialVerificationFailure() {
+        XCTAssertTrue(
+            PurchaseActionPolicy.canBuyLifetime(
+                accessState: .verificationFailed,
+                lifetimeVerificationFailed: false
+            )
+        )
+    }
+
+    func testLifetimePurchaseIsBlockedForLifetimeVerificationFailure() {
+        XCTAssertFalse(
+            PurchaseActionPolicy.canBuyLifetime(
+                accessState: .verificationFailed,
+                lifetimeVerificationFailed: true
+            )
         )
     }
 }

@@ -27,12 +27,17 @@ enum TrialAccessPolicy {
     static func state(purchaseDate: Date?, lifetimeUnlocked: Bool, now: Date) -> AccessState {
         if lifetimeUnlocked { return .lifetimeUnlocked }
         guard let purchaseDate else { return .trialAvailable }
-        guard purchaseDate.timeIntervalSince(now) <= maximumClockSkew else {
+        guard !hasImplausibleFutureDate(purchaseDate, now: now) else {
             return .verificationFailed
         }
 
         let end = purchaseDate.addingTimeInterval(duration)
         return now < end ? .trialActive(endsAt: end) : .trialExpired
+    }
+
+    static func hasImplausibleFutureDate(_ purchaseDate: Date?, now: Date) -> Bool {
+        guard let purchaseDate else { return false }
+        return purchaseDate.timeIntervalSince(now) > maximumClockSkew
     }
 }
 
@@ -40,7 +45,8 @@ enum EntitlementAccessPolicy {
     static func state(
         trialPurchaseDate: Date?,
         lifetimeUnlocked: Bool,
-        ownedVerificationFailed: Bool,
+        trialVerificationFailed: Bool,
+        lifetimeVerificationFailed: Bool,
         now: Date
     ) -> AccessState {
         let evaluated = TrialAccessPolicy.state(
@@ -48,9 +54,21 @@ enum EntitlementAccessPolicy {
             lifetimeUnlocked: lifetimeUnlocked,
             now: now
         )
-        return ownedVerificationFailed && !evaluated.grantsRemoteAccess
+        return (trialVerificationFailed || lifetimeVerificationFailed) && !evaluated.grantsRemoteAccess
             ? .verificationFailed
             : evaluated
+    }
+}
+
+enum ProductCatalogPolicy {
+    static func isValid(trialPrice: Decimal?, lifetimePrice: Decimal?) -> Bool {
+        trialPrice == .zero && lifetimePrice.map { $0 > .zero } == true
+    }
+}
+
+enum PurchaseActionPolicy {
+    static func canBuyLifetime(accessState: AccessState, lifetimeVerificationFailed: Bool) -> Bool {
+        accessState != .lifetimeUnlocked && !lifetimeVerificationFailed
     }
 }
 
@@ -64,6 +82,8 @@ final class PurchaseManager: ObservableObject {
     @Published private(set) var lifetimeProduct: Product?
     @Published private(set) var isWorking = false
     @Published private(set) var isLoadingProducts = false
+    @Published private(set) var trialVerificationFailed = false
+    @Published private(set) var lifetimeVerificationFailed = false
     @Published var errorMessage: String?
     @Published var showPurchaseSheet = false
 
@@ -71,18 +91,11 @@ final class PurchaseManager: ObservableObject {
     private var expiryTask: Task<Void, Never>?
     private var refreshGeneration = 0
     private let now: @Sendable () -> Date
+    private let shouldListenForTransactions: Bool
 
     init(now: @escaping @Sendable () -> Date = { Date() }, listenForTransactions: Bool = true) {
         self.now = now
-        if listenForTransactions {
-            updatesTask = Task { [weak self] in
-                for await result in Transaction.updates {
-                    guard !Task.isCancelled else { return }
-                    guard let self else { return }
-                    await self.handleTransactionUpdate(result)
-                }
-            }
-        }
+        shouldListenForTransactions = listenForTransactions
     }
 
     deinit {
@@ -91,35 +104,68 @@ final class PurchaseManager: ObservableObject {
     }
 
     var hasRemoteAccess: Bool { accessState.grantsRemoteAccess }
+    var canBuyLifetime: Bool {
+        PurchaseActionPolicy.canBuyLifetime(
+            accessState: accessState,
+            lifetimeVerificationFailed: lifetimeVerificationFailed
+        )
+    }
 
     var trialEnd: Date? {
         guard case .trialActive(let end) = accessState else { return nil }
         return end
     }
 
+#if DEBUG
+    func configureForScreenshot(accessState: AccessState) {
+        self.accessState = accessState
+    }
+#endif
+
     func prepare() async {
+        await processUnfinishedTransactions()
+        startTransactionListenerIfNeeded()
         await refreshEntitlements()
         if trialProduct == nil || lifetimeProduct == nil {
             await loadProducts()
         }
     }
 
+    func stopTransactionListener() async {
+        updatesTask?.cancel()
+        await updatesTask?.value
+        updatesTask = nil
+    }
+
     func loadProducts() async {
         guard !isLoadingProducts else { return }
-        errorMessage = nil
+        if accessState != .verificationFailed { errorMessage = nil }
         isLoadingProducts = true
         defer { isLoadingProducts = false }
 
         do {
             let products = try await Product.products(for: [Self.trialProductID, Self.lifetimeProductID])
-            trialProduct = products.first { $0.id == Self.trialProductID && $0.type == .nonConsumable }
-            lifetimeProduct = products.first { $0.id == Self.lifetimeProductID && $0.type == .nonConsumable }
+            let loadedTrial = products.first { $0.id == Self.trialProductID && $0.type == .nonConsumable }
+            let loadedLifetime = products.first { $0.id == Self.lifetimeProductID && $0.type == .nonConsumable }
 
-            guard trialProduct != nil, lifetimeProduct != nil else {
+            guard let loadedTrial, let loadedLifetime else {
+                trialProduct = nil
+                lifetimeProduct = nil
                 errorMessage = String(localized: "Purchases are temporarily unavailable. Please try again later.")
                 return
             }
-            errorMessage = nil
+            guard ProductCatalogPolicy.isValid(
+                trialPrice: loadedTrial.price,
+                lifetimePrice: loadedLifetime.price
+            ) else {
+                trialProduct = nil
+                lifetimeProduct = nil
+                errorMessage = String(localized: "Purchases are configured incorrectly. Please contact support.")
+                return
+            }
+            trialProduct = loadedTrial
+            lifetimeProduct = loadedLifetime
+            if accessState != .verificationFailed { errorMessage = nil }
         } catch is CancellationError {
             return
         } catch {
@@ -144,6 +190,10 @@ final class PurchaseManager: ObservableObject {
     func buyLifetime() async {
         errorMessage = nil
         if accessState == .lifetimeUnlocked { return }
+        guard !lifetimeVerificationFailed else {
+            errorMessage = String(localized: "Your full unlock could not be verified. Use Restore Purchases or contact Apple Support; do not buy it again.")
+            return
+        }
         guard let lifetimeProduct else {
             errorMessage = String(localized: "The one-time unlock is temporarily unavailable.")
             return
@@ -160,7 +210,7 @@ final class PurchaseManager: ObservableObject {
         do {
             try await AppStore.sync()
             await refreshEntitlements()
-            errorMessage = nil
+            if accessState != .verificationFailed { errorMessage = nil }
         } catch is CancellationError {
             return
         } catch {
@@ -173,7 +223,8 @@ final class PurchaseManager: ObservableObject {
         let generation = refreshGeneration
         var lifetimeUnlocked = false
         var trialPurchaseDate: Date?
-        var ownedVerificationFailed = false
+        var trialVerificationFailed = false
+        var lifetimeVerificationFailed = false
 
         for await result in Transaction.currentEntitlements {
             switch result {
@@ -191,20 +242,33 @@ final class PurchaseManager: ObservableObject {
                     continue
                 }
             case .unverified(let transaction, _):
-                if transaction.productID == Self.trialProductID || transaction.productID == Self.lifetimeProductID {
-                    ownedVerificationFailed = true
+                switch transaction.productID {
+                case Self.trialProductID:
+                    trialVerificationFailed = true
+                case Self.lifetimeProductID:
+                    lifetimeVerificationFailed = true
+                default:
+                    continue
                 }
             }
         }
 
         guard generation == refreshGeneration else { return }
 
+        self.trialVerificationFailed = trialVerificationFailed
+        self.lifetimeVerificationFailed = lifetimeVerificationFailed
+        let evaluationTime = now()
         accessState = EntitlementAccessPolicy.state(
             trialPurchaseDate: trialPurchaseDate,
             lifetimeUnlocked: lifetimeUnlocked,
-            ownedVerificationFailed: ownedVerificationFailed,
-            now: now()
+            trialVerificationFailed: trialVerificationFailed,
+            lifetimeVerificationFailed: lifetimeVerificationFailed,
+            now: evaluationTime
         )
+        if !lifetimeUnlocked,
+           TrialAccessPolicy.hasImplausibleFutureDate(trialPurchaseDate, now: evaluationTime) {
+            errorMessage = String(localized: "The purchase date could not be verified. Turn on automatic date and time, then try Restore Purchases.")
+        }
         scheduleTrialExpiryIfNeeded()
     }
 
@@ -228,10 +292,10 @@ final class PurchaseManager: ObservableObject {
                     errorMessage = String(localized: "The App Store returned an unexpected purchase. Nothing was unlocked.")
                     return
                 }
-                deliver(transaction)
+                guard deliver(transaction) else { return }
                 await transaction.finish()
                 await refreshEntitlements()
-                errorMessage = nil
+                if accessState != .verificationFailed { errorMessage = nil }
                 if accessState.grantsRemoteAccess { showPurchaseSheet = false }
             case .pending:
                 errorMessage = String(localized: "This purchase is pending approval. Access will update automatically when it completes.")
@@ -247,19 +311,37 @@ final class PurchaseManager: ObservableObject {
         }
     }
 
+    private func processUnfinishedTransactions() async {
+        for await result in Transaction.unfinished {
+            guard !Task.isCancelled else { return }
+            await handleTransactionUpdate(result)
+        }
+    }
+
+    private func startTransactionListenerIfNeeded() {
+        guard shouldListenForTransactions, updatesTask == nil else { return }
+        updatesTask = Task { [weak self] in
+            for await result in Transaction.updates {
+                guard !Task.isCancelled else { return }
+                guard let self else { return }
+                await self.handleTransactionUpdate(result)
+            }
+        }
+    }
+
     private func handleTransactionUpdate(_ result: VerificationResult<Transaction>) async {
         switch result {
         case .verified(let transaction):
             guard transaction.productType == .nonConsumable,
                   transaction.productID == Self.trialProductID || transaction.productID == Self.lifetimeProductID else { return }
             if transaction.revocationDate == nil {
-                deliver(transaction)
+                guard deliver(transaction) else { return }
             } else {
                 await refreshEntitlements()
             }
             await transaction.finish()
             await refreshEntitlements()
-            errorMessage = nil
+            if accessState != .verificationFailed { errorMessage = nil }
             if accessState.grantsRemoteAccess { showPurchaseSheet = false }
         case .unverified(let transaction, _):
             guard transaction.productID == Self.trialProductID || transaction.productID == Self.lifetimeProductID else { return }
@@ -270,21 +352,32 @@ final class PurchaseManager: ObservableObject {
         }
     }
 
-    private func deliver(_ transaction: Transaction) {
+    @discardableResult
+    private func deliver(_ transaction: Transaction) -> Bool {
         switch transaction.productID {
         case Self.lifetimeProductID:
+            lifetimeVerificationFailed = false
             accessState = .lifetimeUnlocked
         case Self.trialProductID where accessState != .lifetimeUnlocked:
-            accessState = TrialAccessPolicy.state(
+            trialVerificationFailed = false
+            let trialState = TrialAccessPolicy.state(
                 purchaseDate: transaction.originalPurchaseDate,
                 lifetimeUnlocked: false,
                 now: now()
             )
+            guard trialState != .verificationFailed else {
+                accessState = .verificationFailed
+                errorMessage = String(localized: "The purchase date could not be verified. Turn on automatic date and time, then try Restore Purchases.")
+                scheduleTrialExpiryIfNeeded()
+                return false
+            }
+            accessState = trialState
         default:
-            return
+            return false
         }
         scheduleTrialExpiryIfNeeded()
         if accessState.grantsRemoteAccess { showPurchaseSheet = false }
+        return true
     }
 
     private func scheduleTrialExpiryIfNeeded() {

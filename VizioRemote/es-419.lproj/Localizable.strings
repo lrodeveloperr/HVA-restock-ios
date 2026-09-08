@@ -145,6 +145,10 @@
 "The purchase did not complete. Please try again." = "La compra no se completó. Inténtalo de nuevo.";
 "The App Store returned an unexpected purchase. Nothing was unlocked." = "App Store devolvió una compra inesperada. No se desbloqueó nada.";
 "The one-time unlock price is temporarily unavailable. Please try again later." = "El precio del desbloqueo de pago único no está disponible temporalmente. Vuelve a intentarlo más tarde.";
+"Purchases are configured incorrectly. Please contact support." = "Las compras están configuradas incorrectamente. Comunícate con soporte.";
+"Your full unlock could not be verified. Use Restore Purchases or contact Apple Support; do not buy it again." = "No se pudo verificar tu desbloqueo completo. Usa Restaurar compras o contacta al soporte de Apple; no lo compres de nuevo.";
+"The purchase date could not be verified. Turn on automatic date and time, then try Restore Purchases." = "No se pudo verificar la fecha de compra. Activa la fecha y hora automáticas y luego intenta Restaurar compras.";
+"Your full unlock could not be verified. Remote access remains locked. Use Restore Purchases or contact Apple Support; do not buy it again." = "No se pudo verificar tu desbloqueo completo, así que el control remoto sigue bloqueado. Usa Restaurar compras o contacta al soporte de Apple; no lo compres de nuevo.";
 "Your 1-day trial is active" = "Tu prueba de 1 día está activa";
 "Trial access ends %@. It does not renew and you will not be charged automatically. The optional one-time unlock costs %@." = "El acceso de prueba termina %@. No se renueva ni se te cobrará automáticamente. El desbloqueo opcional de pago único cuesta %@.";
 "The TV security identity changed. If you replaced or updated the TV, reset its saved security identity before pairing again." = "La identidad de seguridad de la TV cambió. Si reemplazaste o actualizaste la TV, restablece su identidad guardada antes de volver a vincularla.";

@@ -65,6 +65,14 @@ final class RemoteViewModel: ObservableObject {
         self.tokenStore = tokenStore
     }
 
+#if DEBUG
+    func configureForScreenshotRemote() {
+        device = .demo
+        connectionState = .connected
+        remoteAccessEnabled = true
+    }
+#endif
+
     func restoreLocalDeviceMetadata() {
         guard !isManagingLocalData, device == nil else { return }
         do {

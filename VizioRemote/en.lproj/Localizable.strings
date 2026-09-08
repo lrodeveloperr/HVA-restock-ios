@@ -145,6 +145,10 @@
 "The purchase did not complete. Please try again." = "The purchase did not complete. Please try again.";
 "The App Store returned an unexpected purchase. Nothing was unlocked." = "The App Store returned an unexpected purchase. Nothing was unlocked.";
 "The one-time unlock price is temporarily unavailable. Please try again later." = "The one-time unlock price is temporarily unavailable. Please try again later.";
+"Purchases are configured incorrectly. Please contact support." = "Purchases are configured incorrectly. Please contact support.";
+"Your full unlock could not be verified. Use Restore Purchases or contact Apple Support; do not buy it again." = "Your full unlock could not be verified. Use Restore Purchases or contact Apple Support; do not buy it again.";
+"The purchase date could not be verified. Turn on automatic date and time, then try Restore Purchases." = "The purchase date could not be verified. Turn on automatic date and time, then try Restore Purchases.";
+"Your full unlock could not be verified. Remote access remains locked. Use Restore Purchases or contact Apple Support; do not buy it again." = "Your full unlock could not be verified. Remote access remains locked. Use Restore Purchases or contact Apple Support; do not buy it again.";
 "Your 1-day trial is active" = "Your 1-day trial is active";
 "Trial access ends %@. It does not renew and you will not be charged automatically. The optional one-time unlock costs %@." = "Trial access ends %@. It does not renew and you will not be charged automatically. The optional one-time unlock costs %@.";
 "The TV security identity changed. If you replaced or updated the TV, reset its saved security identity before pairing again." = "The TV security identity changed. If you replaced or updated the TV, reset its saved security identity before pairing again.";

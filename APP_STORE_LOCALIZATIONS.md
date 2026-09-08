@@ -4,9 +4,9 @@ Use these records only after the English source in `APP_STORE.md` is frozen. Con
 
 ## Spanish (Mexico)
 
-- Name: **Control remoto de TV**
+- Name: **Control TV: Mando Simple**
 - Subtitle: **Controles Wi-Fi simples**
-- Promotional text: **Prueba todas las funciones gratis durante un día y conserva el acceso con una compra opcional. Sin anuncios, cuentas ni suscripciones.**
+- Promotional text: **Prueba todas las funciones gratis durante un día y conserva el acceso con una compra opcional. Sin anuncios, cuenta propia ni suscripción.**
 - Keywords: `volumen,teclado,entrada,canal,navegación,multimedia,controlador,televisor inteligente`
 
 ### Description
@@ -20,7 +20,7 @@ FUNCIONES
 • Control direccional con un botón OK grande  
 • Volumen, silencio y canales  
 • Inicio, atrás, menú y selección de entrada  
-• Botón Reproducir/Pausa; su disponibilidad varía según la app y el firmware de la TV  
+• Controles separados de Reproducir y Pausar; su disponibilidad varía según la app y el firmware de la TV  
 • Entrada de texto latino básico  
 • Conexión manual por IP  
 • TV de demostración integrada
@@ -31,7 +31,7 @@ Inicia la prueba gratis de 1 día para usar todas las funciones durante 24 horas
 
 PRIVACIDAD DESDE EL DISEÑO
 
-• Sin cuenta, publicidad ni SDK de análisis  
+• Sin cuenta propia de la app, publicidad ni SDK de análisis  
 • Sin servicio en la nube operado por el desarrollador  
 • Los comandos viajan directamente entre este dispositivo y la TV seleccionada  
 • Los datos de la TV seleccionada, el token de vinculación y la identidad de seguridad se guardan en el llavero de iOS para este dispositivo
@@ -49,9 +49,9 @@ Esta es una app independiente, no afiliada ni respaldada por Vizio, Inc. Vizio y
 
 ## French (Canada)
 
-- Name: **Télécommande TV**
+- Name: **Télécommande TV : Simple**
 - Subtitle: **Commandes Wi-Fi simples**
-- Promotional text: **Essayez toutes les fonctions gratuitement pendant un jour, puis gardez l’accès avec un achat facultatif. Sans publicité, compte ni abonnement.**
+- Promotional text: **Essayez toutes les fonctions gratuitement pendant un jour, puis gardez l’accès avec un achat facultatif. Sans publicité, compte distinct ni abonnement.**
 - Keywords: `volume,clavier,entrée,chaîne,navigation,média,contrôleur,téléviseur intelligent`
 
 ### Description
@@ -65,7 +65,7 @@ FONCTIONS
 • Pavé directionnel avec un grand bouton OK  
 • Volume, sourdine et chaînes  
 • Accueil, retour, menu et sélection de l’entrée  
-• Bouton Lecture/Pause; sa disponibilité varie selon l’app et le micrologiciel du téléviseur  
+• Commandes Lecture et Pause distinctes; leur disponibilité varie selon l’app et le micrologiciel du téléviseur  
 • Saisie de texte latin de base  
 • Connexion manuelle par IP  
 • Téléviseur de démonstration intégré
@@ -76,7 +76,7 @@ Commencez l’essai gratuit de 1 jour pour utiliser toutes les fonctions pendant
 
 CONFIDENTIALITÉ INTÉGRÉE
 
-• Aucun compte, aucune publicité et aucun module d’analyse  
+• Aucun compte distinct pour l’app, aucune publicité et aucun module d’analyse  
 • Aucun service infonuagique exploité par le développeur  
 • Les commandes circulent directement entre cet appareil et le téléviseur sélectionné  
 • Les données du téléviseur sélectionné, le jeton de jumelage et son identité de sécurité sont stockés dans le trousseau iOS pour cet appareil

@@ -145,6 +145,10 @@
 "The purchase did not complete. Please try again." = "L’achat n’a pas été effectué. Veuillez réessayer.";
 "The App Store returned an unexpected purchase. Nothing was unlocked." = "L’App Store a retourné un achat inattendu. Aucun accès n’a été déverrouillé.";
 "The one-time unlock price is temporarily unavailable. Please try again later." = "Le prix du déverrouillage à achat unique est temporairement indisponible. Réessayez plus tard.";
+"Purchases are configured incorrectly. Please contact support." = "Les achats sont mal configurés. Communiquez avec l’assistance.";
+"Your full unlock could not be verified. Use Restore Purchases or contact Apple Support; do not buy it again." = "Votre déverrouillage complet n’a pas pu être vérifié. Utilisez Restaurer les achats ou communiquez avec l’assistance Apple; ne l’achetez pas de nouveau.";
+"The purchase date could not be verified. Turn on automatic date and time, then try Restore Purchases." = "Impossible de vérifier la date d’achat. Activez la date et l’heure automatiques, puis essayez Restaurer les achats.";
+"Your full unlock could not be verified. Remote access remains locked. Use Restore Purchases or contact Apple Support; do not buy it again." = "Votre déverrouillage complet n’a pas pu être vérifié, donc la télécommande reste verrouillée. Utilisez Restaurer les achats ou communiquez avec l’assistance Apple; ne l’achetez pas de nouveau.";
 "Your 1-day trial is active" = "Votre essai de 1 jour est actif";
 "Trial access ends %@. It does not renew and you will not be charged automatically. The optional one-time unlock costs %@." = "L’accès d’essai prend fin %@. Il ne se renouvelle pas et aucuns frais ne vous seront facturés automatiquement. Le déverrouillage unique facultatif coûte %@.";
 "The TV security identity changed. If you replaced or updated the TV, reset its saved security identity before pairing again." = "L’identité de sécurité du téléviseur a changé. Si vous avez remplacé ou mis à jour le téléviseur, réinitialisez son identité enregistrée avant de le jumeler de nouveau.";

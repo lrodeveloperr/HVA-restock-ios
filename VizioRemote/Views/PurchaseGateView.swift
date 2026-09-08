@@ -47,11 +47,12 @@ struct PurchaseGateView: View {
                         .buttonStyle(PrimaryButtonStyle())
                         .disabled(
                             purchases.isWorking || purchases.isLoadingProducts ||
-                            purchases.trialProduct == nil || purchases.lifetimeProduct == nil
+                            (!hasScreenshotPriceOverrides &&
+                             (purchases.trialProduct == nil || purchases.lifetimeProduct == nil))
                         )
                     }
 
-                    if purchases.accessState != .lifetimeUnlocked {
+                    if purchases.canBuyLifetime {
                         Button {
                             Task { await purchases.buyLifetime() }
                         } label: {
@@ -59,7 +60,10 @@ struct PurchaseGateView: View {
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(SecondaryPurchaseButtonStyle())
-                        .disabled(purchases.isWorking || purchases.isLoadingProducts || purchases.lifetimeProduct == nil)
+                        .disabled(
+                            purchases.isWorking || purchases.isLoadingProducts ||
+                            (!hasScreenshotPriceOverrides && purchases.lifetimeProduct == nil)
+                        )
                     }
 
                     if purchases.isWorking || purchases.isLoadingProducts {
@@ -77,7 +81,8 @@ struct PurchaseGateView: View {
                     }
                     .disabled(purchases.isWorking || purchases.isLoadingProducts)
 
-                    if purchases.trialProduct == nil || purchases.lifetimeProduct == nil {
+                    if (purchases.trialProduct == nil || purchases.lifetimeProduct == nil) &&
+                        !hasScreenshotPriceOverrides {
                         Button("Retry App Store") {
                             Task { await purchases.loadProducts() }
                         }
@@ -143,12 +148,40 @@ struct PurchaseGateView: View {
 
     private var trialButtonTitle: String {
         let format = String(localized: "Start 1-day Trial · %@")
-        return String(format: format, purchases.trialProduct?.displayPrice ?? "—")
+        return String(format: format, trialDisplayPrice)
     }
 
     private var lifetimeButtonTitle: String {
         let format = String(localized: "Full Remote Unlock · %@")
-        return String(format: format, purchases.lifetimeProduct?.displayPrice ?? "—")
+        return String(format: format, lifetimeDisplayPrice)
+    }
+
+    private var trialDisplayPrice: String {
+#if DEBUG
+        if let price = ProcessInfo.processInfo.environment["SCREENSHOT_TRIAL_PRICE"] {
+            return price
+        }
+#endif
+        return purchases.trialProduct?.displayPrice ?? "—"
+    }
+
+    private var lifetimeDisplayPrice: String {
+#if DEBUG
+        if let price = ProcessInfo.processInfo.environment["SCREENSHOT_LIFETIME_PRICE"] {
+            return price
+        }
+#endif
+        return purchases.lifetimeProduct?.displayPrice ?? "—"
+    }
+
+    private var hasScreenshotPriceOverrides: Bool {
+#if DEBUG
+        let environment = ProcessInfo.processInfo.environment
+        return environment["SCREENSHOT_TRIAL_PRICE"] != nil &&
+            environment["SCREENSHOT_LIFETIME_PRICE"] != nil
+#else
+        return false
+#endif
     }
 
     private var disclosure: String {
@@ -156,6 +189,9 @@ struct PurchaseGateView: View {
             return String(localized: "Remote control access stopped when the 24-hour trial ended. The trial does not renew and made no automatic charge. Buy the one-time unlock to restore full access.")
         }
         if purchases.accessState == .verificationFailed {
+            if purchases.lifetimeVerificationFailed {
+                return String(localized: "Your full unlock could not be verified. Remote access remains locked. Use Restore Purchases or contact Apple Support; do not buy it again.")
+            }
             return String(localized: "An App Store purchase could not be verified, so remote access remains locked. Try Restore Purchases or contact Apple Support. No new purchase is required until verification is resolved.")
         }
         if let trialEnd = purchases.trialEnd {
@@ -163,11 +199,11 @@ struct PurchaseGateView: View {
             return String(
                 format: format,
                 trialEnd.formatted(date: .abbreviated, time: .shortened),
-                purchases.lifetimeProduct?.displayPrice ?? "—"
+                lifetimeDisplayPrice
             )
         }
         let format = String(localized: "The free 1-day Trial unlocks all remote features for 24 hours. Remote control access stops when it ends. It does not renew and you will not be charged automatically. Afterward, the optional one-time unlock costs %@.")
-        return String(format: format, purchases.lifetimeProduct?.displayPrice ?? "—")
+        return String(format: format, lifetimeDisplayPrice)
     }
 }
 
