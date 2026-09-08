@@ -37,7 +37,7 @@ jobs:
           for key in ASC_KEY_ID ASC_ISSUER_ID ASC_PRIVATE_KEY; do
             [[ -n "${!key:-}" ]] || { echo "Missing protected $key input." >&2; exit 1; }
           done
-          [[ "$BUILD_NUMBER" =~ ^[1-9][0-9]{0,3}(\.[0-9]{1,2}){0,2}$ ]] || {
+          [[ "$BUILD_NUMBER" =~ ^[1-9][0-9]{0,11}(\.[0-9]{1,2}){0,2}$ ]] || {
             echo "Invalid TestFlight build number." >&2
             exit 1
           }
@@ -168,54 +168,24 @@ jobs:
           abort "Build #{BUILD_NUMBER} did not finish processing within 30 minutes." unless build
           build_id = build.fetch("id")
 
-          if TESTER_EMAIL.empty?
-            groups = api_request(
-              :get,
-              query_path("/v1/betaGroups", { "filter[app]" => APP_ID, "limit" => "200" }),
-            ).fetch("data", [])
-            group = groups.find do |item|
-              item.dig("attributes", "isInternalGroup") == true &&
-                item.dig("attributes", "name") == GROUP_NAME
-            end
-            abort "The existing internal TestFlight group was not found, and no tester email is configured." unless group
-            group_id = group.fetch("id")
-            group_testers = api_request(
-              :get,
-              "/v1/betaGroups/#{group_id}/relationships/betaTesters",
-            ).fetch("data", [])
-            abort "The existing internal TestFlight group has no testers." if group_testers.empty?
-
-            group_builds = api_request(
-              :get,
-              "/v1/betaGroups/#{group_id}/relationships/builds",
-            ).fetch("data", [])
-            unless group_builds.any? { |item| item["id"] == build_id }
-              api_request(
-                :post,
-                "/v1/betaGroups/#{group_id}/relationships/builds",
-                body: { data: [{ type: "builds", id: build_id }] },
-                allowed: [204],
-              )
-              group_builds = api_request(
-                :get,
-                "/v1/betaGroups/#{group_id}/relationships/builds",
-              ).fetch("data", [])
-            end
-            abort "Build relationship verification failed." unless group_builds.any? { |item| item["id"] == build_id }
-            puts "Build #{BUILD_NUMBER} is available to #{group_testers.length} existing internal TestFlight tester(s)."
-            exit
-          end
-
           team_users = api_request(
             :get,
             query_path("/v1/users", { "limit" => "200" }),
           ).fetch("data", [])
-          users = team_users.select do |user|
-            attributes = user.fetch("attributes", {})
-            identity = attributes["username"] || attributes["email"]
-            identity.to_s.casecmp?(TESTER_EMAIL)
+          if TESTER_EMAIL.empty?
+            users = team_users.select do |user|
+              Array(user.dig("attributes", "roles")).include?("ACCOUNT_HOLDER")
+            end
+            abort "Could not resolve exactly one App Store Connect Account Holder for internal testing." unless users.length == 1
+            puts "Resolved the sole App Store Connect Account Holder as the internal tester."
+          else
+            users = team_users.select do |user|
+              attributes = user.fetch("attributes", {})
+              identity = attributes["username"] || attributes["email"]
+              identity.to_s.casecmp?(TESTER_EMAIL)
+            end
+            abort "The confirmed recipient is not an App Store Connect team user, so internal TestFlight cannot be enabled safely." if users.empty?
           end
-          abort "The confirmed recipient is not an App Store Connect team user, so internal TestFlight cannot be enabled safely." if users.empty?
           user_attributes = users.first.fetch("attributes", {})
           user_id = users.first.fetch("id")
           visible_apps = api_request(
