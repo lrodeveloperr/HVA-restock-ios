@@ -1,0 +1,247 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* VizioRemoteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* VizioRemoteApp.swift */; };
+		A10000000000000000000002 /* TVDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* TVDevice.swift */; };
+		A10000000000000000000003 /* RemoteCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* RemoteCommand.swift */; };
+		A10000000000000000000004 /* LocalNetworkAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000004 /* LocalNetworkAddress.swift */; };
+		A10000000000000000000005 /* SSDPResponseParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* SSDPResponseParser.swift */; };
+		A10000000000000000000006 /* SSDPDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* SSDPDiscovery.swift */; };
+		A10000000000000000000007 /* SmartCastService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* SmartCastService.swift */; };
+		A10000000000000000000008 /* DemoSmartCastService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000008 /* DemoSmartCastService.swift */; };
+		A10000000000000000000009 /* DeviceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000009 /* DeviceStore.swift */; };
+		A1000000000000000000000A /* KeychainTokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000A /* KeychainTokenStore.swift */; };
+		A1000000000000000000000B /* RemoteViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000B /* RemoteViewModel.swift */; };
+		A1000000000000000000000C /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000C /* RootView.swift */; };
+		A1000000000000000000000D /* ConnectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000D /* ConnectionView.swift */; };
+		A1000000000000000000000E /* ManualEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000E /* ManualEntryView.swift */; };
+		A1000000000000000000000F /* PairingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000F /* PairingView.swift */; };
+		A10000000000000000000010 /* RemoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000010 /* RemoteView.swift */; };
+		A10000000000000000000011 /* TextEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* TextEntryView.swift */; };
+		A10000000000000000000012 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* SettingsView.swift */; };
+		A10000000000000000000013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* Assets.xcassets */; };
+		A10000000000000000000014 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000014 /* PrivacyInfo.xcprivacy */; };
+		A10000000000000000000015 /* LocalNetworkAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000017 /* LocalNetworkAddressTests.swift */; };
+		A10000000000000000000016 /* SSDPResponseParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000018 /* SSDPResponseParserTests.swift */; };
+		A10000000000000000000017 /* RemoteCommandTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000019 /* RemoteCommandTests.swift */; };
+		A10000000000000000000018 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 720000000000000000000001 /* Localizable.strings */; };
+		A10000000000000000000019 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 720000000000000000000002 /* InfoPlist.strings */; };
+		A1000000000000000000001A /* PurchaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000022 /* PurchaseManager.swift */; };
+		A1000000000000000000001B /* PurchaseGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000023 /* PurchaseGateView.swift */; };
+		A1000000000000000000001C /* TrialAccessPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000024 /* TrialAccessPolicyTests.swift */; };
+		A1000000000000000000001D /* SmartCastServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000026 /* SmartCastServiceTests.swift */; };
+		A1000000000000000000001E /* CertificatePinStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000027 /* CertificatePinStore.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C10000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D10000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E10000000000000000000001;
+			remoteInfo = VizioRemote;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		B10000000000000000000001 /* VizioRemoteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VizioRemoteApp.swift; sourceTree = "<group>"; };
+		B10000000000000000000002 /* TVDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TVDevice.swift; sourceTree = "<group>"; };
+		B10000000000000000000003 /* RemoteCommand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommand.swift; sourceTree = "<group>"; };
+		B10000000000000000000004 /* LocalNetworkAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNetworkAddress.swift; sourceTree = "<group>"; };
+		B10000000000000000000005 /* SSDPResponseParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSDPResponseParser.swift; sourceTree = "<group>"; };
+		B10000000000000000000006 /* SSDPDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSDPDiscovery.swift; sourceTree = "<group>"; };
+		B10000000000000000000007 /* SmartCastService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCastService.swift; sourceTree = "<group>"; };
+		B10000000000000000000008 /* DemoSmartCastService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoSmartCastService.swift; sourceTree = "<group>"; };
+		B10000000000000000000009 /* DeviceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStore.swift; sourceTree = "<group>"; };
+		B1000000000000000000000A /* KeychainTokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainTokenStore.swift; sourceTree = "<group>"; };
+		B1000000000000000000000B /* RemoteViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteViewModel.swift; sourceTree = "<group>"; };
+		B1000000000000000000000C /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		B1000000000000000000000D /* ConnectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionView.swift; sourceTree = "<group>"; };
+		B1000000000000000000000E /* ManualEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualEntryView.swift; sourceTree = "<group>"; };
+		B1000000000000000000000F /* PairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingView.swift; sourceTree = "<group>"; };
+		B10000000000000000000010 /* RemoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteView.swift; sourceTree = "<group>"; };
+		B10000000000000000000011 /* TextEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextEntryView.swift; sourceTree = "<group>"; };
+		B10000000000000000000012 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B10000000000000000000013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B10000000000000000000014 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		B10000000000000000000015 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B10000000000000000000016 /* VizioRemote.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = VizioRemote.entitlements; sourceTree = "<group>"; };
+		B10000000000000000000017 /* LocalNetworkAddressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalNetworkAddressTests.swift; sourceTree = "<group>"; };
+		B10000000000000000000018 /* SSDPResponseParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSDPResponseParserTests.swift; sourceTree = "<group>"; };
+		B10000000000000000000019 /* RemoteCommandTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteCommandTests.swift; sourceTree = "<group>"; };
+		B1000000000000000000001A /* VizioRemote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VizioRemote.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1000000000000000000001B /* VizioRemoteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VizioRemoteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B1000000000000000000001C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		B1000000000000000000001D /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		B1000000000000000000001E /* fr-CA */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fr-CA"; path = "fr-CA.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		B1000000000000000000001F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		B10000000000000000000020 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		B10000000000000000000021 /* fr-CA */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "fr-CA"; path = "fr-CA.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		B10000000000000000000022 /* PurchaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseManager.swift; sourceTree = "<group>"; };
+		B10000000000000000000023 /* PurchaseGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseGateView.swift; sourceTree = "<group>"; };
+		B10000000000000000000024 /* TrialAccessPolicyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrialAccessPolicyTests.swift; sourceTree = "<group>"; };
+		B10000000000000000000025 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
+		B10000000000000000000026 /* SmartCastServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartCastServiceTests.swift; sourceTree = "<group>"; };
+		B10000000000000000000027 /* CertificatePinStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificatePinStore.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F10000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		F10000000000000000000002 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		710000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				710000000000000000000002 /* VizioRemote */,
+				710000000000000000000008 /* VizioRemoteTests */,
+				B10000000000000000000025 /* Products.storekit */,
+				710000000000000000000009 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		710000000000000000000002 /* VizioRemote */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000001 /* VizioRemoteApp.swift */,
+				710000000000000000000003 /* Models */,
+				710000000000000000000004 /* Networking */,
+				710000000000000000000005 /* Persistence */,
+				71000000000000000000000A /* Purchases */,
+				710000000000000000000006 /* ViewModels */,
+				710000000000000000000007 /* Views */,
+				B10000000000000000000013 /* Assets.xcassets */,
+				B10000000000000000000014 /* PrivacyInfo.xcprivacy */,
+				B10000000000000000000015 /* Info.plist */,
+				B10000000000000000000016 /* VizioRemote.entitlements */,
+				720000000000000000000001 /* Localizable.strings */,
+				720000000000000000000002 /* InfoPlist.strings */,
+			);
+			path = VizioRemote;
+			sourceTree = "<group>";
+		};
+		710000000000000000000003 /* Models */ = {isa = PBXGroup; children = (B10000000000000000000002, B10000000000000000000003,); path = Models; sourceTree = "<group>"; };
+		710000000000000000000004 /* Networking */ = {isa = PBXGroup; children = (B10000000000000000000004, B10000000000000000000005, B10000000000000000000006, B10000000000000000000007, B10000000000000000000008,); path = Networking; sourceTree = "<group>"; };
+		710000000000000000000005 /* Persistence */ = {isa = PBXGroup; children = (B10000000000000000000009, B1000000000000000000000A, B10000000000000000000027,); path = Persistence; sourceTree = "<group>"; };
+		71000000000000000000000A /* Purchases */ = {isa = PBXGroup; children = (B10000000000000000000022,); path = Purchases; sourceTree = "<group>"; };
+		710000000000000000000006 /* ViewModels */ = {isa = PBXGroup; children = (B1000000000000000000000B,); path = ViewModels; sourceTree = "<group>"; };
+		710000000000000000000007 /* Views */ = {isa = PBXGroup; children = (B1000000000000000000000C, B1000000000000000000000D, B1000000000000000000000E, B1000000000000000000000F, B10000000000000000000010, B10000000000000000000011, B10000000000000000000012, B10000000000000000000023,); path = Views; sourceTree = "<group>"; };
+		710000000000000000000008 /* VizioRemoteTests */ = {isa = PBXGroup; children = (B10000000000000000000017, B10000000000000000000018, B10000000000000000000019, B10000000000000000000024, B10000000000000000000026,); path = VizioRemoteTests; sourceTree = "<group>"; };
+		710000000000000000000009 /* Products */ = {isa = PBXGroup; children = (B1000000000000000000001A /* VizioRemote.app */, B1000000000000000000001B /* VizioRemoteTests.xctest */,); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXVariantGroup section */
+		720000000000000000000001 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B1000000000000000000001C /* en */,
+				B1000000000000000000001D /* es-419 */,
+				B1000000000000000000001E /* fr-CA */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		720000000000000000000002 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B1000000000000000000001F /* en */,
+				B10000000000000000000020 /* es-419 */,
+				B10000000000000000000021 /* fr-CA */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin PBXNativeTarget section */
+		E10000000000000000000001 /* VizioRemote */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 810000000000000000000002 /* Build configuration list for PBXNativeTarget "VizioRemote" */;
+			buildPhases = (C20000000000000000000001 /* Sources */, F10000000000000000000001 /* Frameworks */, A20000000000000000000001 /* Resources */,);
+			buildRules = ();
+			dependencies = ();
+			name = VizioRemote;
+			productName = VizioRemote;
+			productReference = B1000000000000000000001A /* VizioRemote.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E10000000000000000000002 /* VizioRemoteTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 810000000000000000000003 /* Build configuration list for PBXNativeTarget "VizioRemoteTests" */;
+			buildPhases = (C20000000000000000000002 /* Sources */, F10000000000000000000002 /* Frameworks */, A20000000000000000000002 /* Resources */,);
+			buildRules = ();
+			dependencies = (D20000000000000000000001 /* PBXTargetDependency */,);
+			name = VizioRemoteTests;
+			productName = VizioRemoteTests;
+			productReference = B1000000000000000000001B /* VizioRemoteTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D10000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					E10000000000000000000001 = {CreatedOnToolsVersion = 16.0; };
+					E10000000000000000000002 = {CreatedOnToolsVersion = 16.0; TestTargetID = E10000000000000000000001; };
+				};
+			};
+			buildConfigurationList = 810000000000000000000001 /* Build configuration list for PBXProject "VizioRemote" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, "es-419", "fr-CA", Base,);
+			mainGroup = 710000000000000000000001;
+			productRefGroup = 710000000000000000000009 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (E10000000000000000000001 /* VizioRemote */, E10000000000000000000002 /* VizioRemoteTests */,);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A20000000000000000000001 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000013 /* Assets.xcassets in Resources */, A10000000000000000000014 /* PrivacyInfo.xcprivacy in Resources */, A10000000000000000000018 /* Localizable.strings in Resources */, A10000000000000000000019 /* InfoPlist.strings in Resources */,); runOnlyForDeploymentPostprocessing = 0; };
+		A20000000000000000000002 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C20000000000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (A10000000000000000000001, A10000000000000000000002, A10000000000000000000003, A10000000000000000000004, A10000000000000000000005, A10000000000000000000006, A10000000000000000000007, A10000000000000000000008, A10000000000000000000009, A1000000000000000000000A, A1000000000000000000000B, A1000000000000000000000C, A1000000000000000000000D, A1000000000000000000000E, A1000000000000000000000F, A10000000000000000000010, A10000000000000000000011, A10000000000000000000012, A1000000000000000000001A, A1000000000000000000001B, A1000000000000000000001E,);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C20000000000000000000002 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A10000000000000000000015, A10000000000000000000016, A10000000000000000000017, A1000000000000000000001C, A1000000000000000000001D,); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D20000000000000000000001 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = E10000000000000000000001 /* VizioRemote */; targetProxy = C10000000000000000000001 /* PBXContainerItemProxy */; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		910000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ANALYZER_NONNULL = YES; CLANG_CXX_LANGUAGE_STANDARD = "gnu++20"; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; CLANG_WARN_BOOL_CONVERSION = YES; CLANG_WARN_COMMA = YES; CLANG_WARN_CONSTANT_CONVERSION = YES; CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES; CLANG_WARN_DOCUMENTATION_COMMENTS = YES; CLANG_WARN_EMPTY_BODY = YES; CLANG_WARN_ENUM_CONVERSION = YES; CLANG_WARN_INFINITE_RECURSION = YES; CLANG_WARN_INT_CONVERSION = YES; CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES; CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES; CLANG_WARN_OBJC_LITERAL_CONVERSION = YES; CLANG_WARN_RANGE_LOOP_ANALYSIS = YES; CLANG_WARN_STRICT_PROTOTYPES = YES; CLANG_WARN_SUSPICIOUS_MOVE = YES; CLANG_WARN_UNREACHABLE_CODE = YES; COPY_PHASE_STRIP = NO; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_TESTABILITY = YES; GCC_C_LANGUAGE_STANDARD = gnu17; GCC_NO_COMMON_BLOCKS = YES; GCC_OPTIMIZATION_LEVEL = 0; GCC_PREPROCESSOR_DEFINITIONS = ("DEBUG=1", "$(inherited)",); GCC_WARN_64_TO_32_BIT_CONVERSION = YES; GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR; GCC_WARN_UNDECLARED_SELECTOR = YES; GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE; GCC_WARN_UNUSED_FUNCTION = YES; GCC_WARN_UNUSED_VARIABLE = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE; MTL_FAST_MATH = YES; ONLY_ACTIVE_ARCH = YES; SDKROOT = iphoneos; SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
+		910000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ANALYZER_NONNULL = YES; CLANG_CXX_LANGUAGE_STANDARD = "gnu++20"; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; CLANG_WARN_BOOL_CONVERSION = YES; CLANG_WARN_COMMA = YES; CLANG_WARN_CONSTANT_CONVERSION = YES; CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES; CLANG_WARN_DOCUMENTATION_COMMENTS = YES; CLANG_WARN_EMPTY_BODY = YES; CLANG_WARN_ENUM_CONVERSION = YES; CLANG_WARN_INFINITE_RECURSION = YES; CLANG_WARN_INT_CONVERSION = YES; CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES; CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES; CLANG_WARN_OBJC_LITERAL_CONVERSION = YES; CLANG_WARN_RANGE_LOOP_ANALYSIS = YES; CLANG_WARN_STRICT_PROTOTYPES = YES; CLANG_WARN_SUSPICIOUS_MOVE = YES; CLANG_WARN_UNREACHABLE_CODE = YES; COPY_PHASE_STRIP = YES; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; ENABLE_NS_ASSERTIONS = NO; GCC_C_LANGUAGE_STANDARD = gnu17; GCC_NO_COMMON_BLOCKS = YES; GCC_WARN_64_TO_32_BIT_CONVERSION = YES; GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR; GCC_WARN_UNDECLARED_SELECTOR = YES; GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE; GCC_WARN_UNUSED_FUNCTION = YES; GCC_WARN_UNUSED_VARIABLE = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; MTL_ENABLE_DEBUG_INFO = NO; MTL_FAST_MATH = YES; SDKROOT = iphoneos; SWIFT_COMPILATION_MODE = wholemodule; VALIDATE_PRODUCT = YES; }; name = Release; };
+		910000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor; CODE_SIGN_ENTITLEMENTS = VizioRemote/VizioRemote.entitlements; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = VizioRemote/Info.plist; INFOPLIST_KEY_CFBundleDisplayName = "TV Remote"; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks",); MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = com.worksbienstudios.clearmote; PRODUCT_NAME = "$(TARGET_NAME)"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_STRICT_CONCURRENCY = complete; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; }; name = Debug; };
+		910000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor; CODE_SIGN_ENTITLEMENTS = VizioRemote/VizioRemote.entitlements; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = VizioRemote/Info.plist; INFOPLIST_KEY_CFBundleDisplayName = "TV Remote"; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks",); MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = com.worksbienstudios.clearmote; PRODUCT_NAME = "$(TARGET_NAME)"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_STRICT_CONCURRENCY = complete; SWIFT_TREAT_WARNINGS_AS_ERRORS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; }; name = Release; };
+		910000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@loader_path/Frameworks",); PRODUCT_BUNDLE_IDENTIFIER = com.worksbienstudios.clearmote.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_STRICT_CONCURRENCY = complete; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VizioRemote.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VizioRemote"; }; name = Debug; };
+		910000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/Frameworks", "@loader_path/Frameworks",); PRODUCT_BUNDLE_IDENTIFIER = com.worksbienstudios.clearmote.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SWIFT_STRICT_CONCURRENCY = complete; SWIFT_TREAT_WARNINGS_AS_ERRORS = YES; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = "1,2"; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/VizioRemote.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/VizioRemote"; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		810000000000000000000001 /* Build configuration list for PBXProject "VizioRemote" */ = {isa = XCConfigurationList; buildConfigurations = (910000000000000000000001 /* Debug */, 910000000000000000000002 /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		810000000000000000000002 /* Build configuration list for PBXNativeTarget "VizioRemote" */ = {isa = XCConfigurationList; buildConfigurations = (910000000000000000000003 /* Debug */, 910000000000000000000004 /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		810000000000000000000003 /* Build configuration list for PBXNativeTarget "VizioRemoteTests" */ = {isa = XCConfigurationList; buildConfigurations = (910000000000000000000005 /* Debug */, 910000000000000000000006 /* Release */,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = D10000000000000000000001 /* Project object */;
+}

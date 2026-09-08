@@ -1,49 +1,46 @@
-# HVAC Restock for iOS
+# TV Remote Control for iPhone and iPad
 
-Native SwiftUI source for a private, offline HVAC truck-stock utility.
+A native SwiftUI remote for compatible Vizio SmartCast televisions. The app talks directly to the selected television over the local network; it has no developer-operated backend, advertising, analytics or account system.
 
-## Product contract
+## Commerce
 
-- One-tap `Used` action decreases an item's quantity by one.
-- Items at or below their restock threshold appear automatically in Restock.
-- Suggested purchase quantity is `max(0, restockTo - onHand)`.
-- Every quantity mutation writes an activity event that can be reversed once.
-- Ten active items are free; item 11 requires the non-consumable lifetime unlock.
-- Existing records, activity, reversal, and CSV export are never blocked.
-- No accounts, ads, analytics, publisher cloud, customer records, scheduling, or photographs.
+The App Store download is free. StoreKit 2 supplies two non-consumable products:
 
-## Native engine
+- `com.worksbienstudios.clearmote.trial.1day` — free **1-day Trial**, providing all remote features for 24 hours after its verified App Store transaction.
+- `com.worksbienstudios.clearmote.lifetime` — optional **Full Remote Unlock**, a one-time purchase whose entitlement does not expire. The UI always uses Apple's localized `displayPrice`.
 
-The app uses only Apple platform frameworks:
+The trial does not renew and does not automatically charge. Eligible purchases can be restored for the same Apple Account. There are no subscriptions.
 
-- SwiftData for device-local persistence
-- StoreKit 2 for the one-time non-consumable purchase
-- UniformTypeIdentifiers and native share/file pickers for CSV
-- SwiftUI and the approved GoodUse shell for presentation
+## Open in Xcode
 
-There is no third-party SDK or third-party source dependency. The app-specific code is therefore suitable for the owner's commercial application subject to Apple's normal SDK and App Store terms.
+1. Open `VizioRemote.xcodeproj` in Xcode 16 or later.
+2. Select the `VizioRemote` target and confirm bundle ID `com.worksbienstudios.clearmote`, signing team and version.
+3. Open `Products.storekit` and confirm both non-consumables validate.
+4. Obtain Apple's multicast-networking entitlement for the production App ID before relying on automatic SSDP discovery.
+5. Run unit tests and StoreKit tests on iPhone and iPad destinations.
+6. Run on a physical iPhone/iPad and a representative compatible TV before making hardware claims.
 
-## Xcode integration
+Deployment target: iOS 17.0.
 
-1. In Xcode 16 or later, create an iOS App project with SwiftUI and Swift.
-2. Choose **File → Add Package Dependencies → Add Local** and select this folder.
-3. Add the package product `HVACRestock` to the app target.
-4. Replace the generated app entry point with `AppHost/HVACRestockApp.swift`. Its import is `HVACRestockApp`, the module exposed by the package product.
-5. Add `AppHost/Assets.xcassets` to the app target and select its `AppIcon` set as the target's App Icons Source. The icon is used only by iOS and the App Store; it is not shown inside the app UI.
-6. Create a non-consumable App Store Connect product whose identifier matches `PurchaseManager.productID`.
-7. Set the localized App Store price to the approved one-time tier (US reference price: $14.99).
-8. Confirm the published privacy and terms URLs in `AppLinks.swift` return the HVAC Restock documents.
+## Hardware-free checks
 
-For CI/TestFlight, install XcodeGen and run `xcodegen generate`. The generated project is `HVACRestock.xcodeproj`, the production scheme is `HVACRestock`, the bundle identifier is `com.worksbienstudios.hvacrestock`, and the included privacy manifest declares the app-only `UserDefaults` reason used by first-run state.
+The built-in **Try Demo TV** path uses PIN `1234` and exercises pairing, buttons, text input, reconnection and reset without a television. The Python fixture can run a protocol contract self-test with:
 
-The package targets iOS 17 because SwiftData is the production persistence engine.
+```bash
+python3 MockTV/mock_smartcast.py --self-test
+```
 
-## Shell boundary
+These checks do not prove that SSDP, self-signed TLS, pairing or commands work on real firmware.
 
-`GoodUseShell.swift` is the approved shell layer. App-specific models, state, workflow, validation, persistence, purchase logic, CSV handling, and screens live outside it.
+## Security and limitations
 
-## Validation boundary
+- Only canonical private IPv4 addresses and SmartCast ports 7345/9000 are accepted.
+- Redirects are rejected, responses are bounded, commands use a bounded FIFO, and selected-TV metadata, tokens and TV certificate pins are device-only Keychain items.
+- The first PIN pairing uses trust-on-first-use for the TV's self-signed certificate; later certificate changes are blocked until the user explicitly resets the saved identity.
+- SSDP is an untrusted hint. A user must recognize and select the TV, and successful PIN pairing is required.
+- IPv6-only/NAT64 behavior, multicast reply handling, command mappings, power-state behavior and firmware coverage remain physical-device release gates.
+- Vizio's local SmartCast API is not a vendor-supported public SDK and may change.
 
-Pure domain and CSV tests plus executable HTML adversarial fixtures are included. Run `Scripts/validate_integrity.sh` for the checks available on any development machine. The current Linux workspace does not contain Xcode or the Apple SwiftUI/SwiftData frameworks, so final iOS compilation, StoreKit sandbox purchase verification, simulator rendering, and accessibility inspection remain Xcode-stage checks.
+No third-party source code is vendored. Request shapes were independently implemented with public protocol references, including `exiva/Vizio_SmartCast_API`.
 
-`Samples/HVAC-Inventory-Template.csv` is a ready-to-import template for smoke testing the workflow. See `VALIDATION.md` for the completed checks and release gate.
+See `RELEASE_CHECKLIST.md`, `APP_STORE.md` and `AUDIT_REPORT.md` before submission.

@@ -1,0 +1,73 @@
+{
+  "identifier" : "AC6A40A3-3C5E-4F22-9A24-21B49DD3FD72",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+    {
+      "displayPrice" : "0",
+      "familyShareable" : false,
+      "internalID" : "09149E7B-4932-42B3-A85A-E388488DCE74",
+      "localizations" : [
+        {
+          "description" : "Full remote-control access for 24 hours. Access locks afterward and no charge occurs automatically.",
+          "displayName" : "1-day Trial",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "Acceso completo al control remoto durante 24 horas. Después, el acceso se bloquea sin cargos automáticos.",
+          "displayName" : "Prueba de 1 día",
+          "locale" : "es_MX"
+        },
+        {
+          "description" : "Accès complet à la télécommande pendant 24 heures. Ensuite, l’accès est verrouillé sans frais automatiques.",
+          "displayName" : "Essai de 1 jour",
+          "locale" : "fr_CA"
+        }
+      ],
+      "productID" : "com.worksbienstudios.clearmote.trial.1day",
+      "referenceName" : "1-day Trial",
+      "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : false,
+      "internalID" : "6D22279A-6EE3-4B60-A39B-EB2979A54750",
+      "localizations" : [
+        {
+          "description" : "Unlock all remote-control features with a one-time purchase. The entitlement does not expire.",
+          "displayName" : "Full Remote Unlock",
+          "locale" : "en_US"
+        },
+        {
+          "description" : "Desbloquea todas las funciones del control remoto con una compra única. El derecho no caduca.",
+          "displayName" : "Desbloqueo completo",
+          "locale" : "es_MX"
+        },
+        {
+          "description" : "Déverrouillez toutes les fonctions de la télécommande avec un achat unique. Le droit n’expire pas.",
+          "displayName" : "Déverrouillage complet",
+          "locale" : "fr_CA"
+        }
+      ],
+      "productID" : "com.worksbienstudios.clearmote.lifetime",
+      "referenceName" : "Full Remote Unlock",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ]
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

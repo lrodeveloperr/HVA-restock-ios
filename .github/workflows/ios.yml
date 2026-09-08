@@ -1,0 +1,79 @@
+name: Validate TV Remote Control iOS
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tv-remote-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - name: Select Xcode
+        run: |
+          if [[ -d /Applications/Xcode_26.6.app ]]; then
+            sudo xcode-select -s /Applications/Xcode_26.6.app/Contents/Developer
+          fi
+          xcodebuild -version
+      - name: Validate project and localizations
+        run: |
+          plutil -lint VizioRemote/Info.plist VizioRemote/PrivacyInfo.xcprivacy
+          python3 -m py_compile MockTV/mock_smartcast.py
+          test "$(find VizioRemote -name Localizable.strings | wc -l | tr -d ' ')" = "3"
+          while IFS= read -r file; do plutil -lint "$file"; done < <(find VizioRemote -name '*.strings' -print)
+      - name: Build Debug and Release without signing
+        run: |
+          xcodebuild \
+            -project VizioRemote.xcodeproj \
+            -scheme VizioRemote \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+          xcodebuild \
+            -project VizioRemote.xcodeproj \
+            -scheme VizioRemote \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+      - name: Analyze
+        run: |
+          xcodebuild \
+            -project VizioRemote.xcodeproj \
+            -scheme VizioRemote \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            analyze
+      - name: Run unit tests
+        run: |
+          DEVICE_ID="$(xcrun simctl list devices available -j | ruby -rjson -e '
+            devices = JSON.parse(STDIN.read).fetch("devices").values.flatten
+            phone = devices.find { |d| d["isAvailable"] && d["name"].start_with?("iPhone") }
+            abort "No available iPhone simulator" unless phone
+            puts phone.fetch("udid")
+          ')"
+          xcrun simctl boot "$DEVICE_ID" 2>/dev/null || true
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+          xcodebuild \
+            -project VizioRemote.xcodeproj \
+            -scheme VizioRemote \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$DEVICE_ID" \
+            CODE_SIGNING_ALLOWED=NO \
+            ENABLE_TESTABILITY=YES \
+            test
