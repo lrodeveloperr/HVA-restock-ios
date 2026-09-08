@@ -106,7 +106,7 @@ jobs:
           english_description = <<~TEXT
             Control a compatible Vizio SmartCast television from your iPhone or iPad over your local network.
 
-            Remote for Vizio Smart TV keeps the interface focused on everyday controls: navigation, volume, channels, input selection, playback and basic text entry. Use automatic discovery when available or enter the TV's local IPv4 address manually.
+            ClearMote: Remote for Vizio keeps the interface focused on everyday controls: navigation, volume, channels, input selection, playback and basic text entry. Use automatic discovery when available or enter the TV's local IPv4 address manually.
 
             FEATURES
 
@@ -134,7 +134,7 @@ jobs:
 
             Requires a compatible Vizio SmartCast television and a working local network. Firmware, model, network isolation and power settings can affect availability. Power-on is not guaranteed when the TV is unreachable. IPv6-only networks are not currently supported; the TV must expose a private IPv4 address. Legacy Vizio Internet Apps televisions are not supported.
 
-            Remote for Vizio Smart TV is an independent application and is not affiliated with or endorsed by Vizio, Inc. Vizio and SmartCast are trademarks of their owner and are used only to describe compatibility.
+            ClearMote: Remote for Vizio is an independent application and is not affiliated with or endorsed by Vizio, Inc. Vizio and SmartCast are trademarks of their owner and are used only to describe compatibility.
           TEXT
 
           review_notes = <<~TEXT
@@ -171,18 +171,18 @@ jobs:
           info_locs = info_locs_doc.fetch("data", [])
           info_by_locale = {
             "en-US" => {
-              name: "Remote for Vizio Smart TV",
-              subtitle: "WiFi Controller & Keyboard",
+              name: "ClearMote: Remote for Vizio",
+              subtitle: "Smart TV WiFi & Keyboard",
               privacyPolicyUrl: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/privacy/",
             },
             "es-MX" => {
-              name: "Control Remoto para Vizio",
-              subtitle: "Control WiFi y Teclado",
+              name: "ClearMote: Control para Vizio",
+              subtitle: "Smart TV WiFi y Teclado",
               privacyPolicyUrl: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/privacy/",
             },
             "fr-CA" => {
-              name: "Télécommande pour Vizio",
-              subtitle: "Commande WiFi et Clavier",
+              name: "ClearMote : Télécommande Vizio",
+              subtitle: "Smart TV WiFi et Clavier",
               privacyPolicyUrl: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/privacy/",
             },
           }
@@ -207,7 +207,7 @@ jobs:
           version_locs = version_locs_doc.fetch("data", [])
           version_attributes = {
             description: english_description,
-            keywords: "volume,input,channel,navigation,media,power,dpad,buttons,pairing",
+            keywords: "volume,input,channel,navigation,media,power,dpad,buttons,pairing,controller",
             marketingUrl: "https://worksbienstudios.com/apps/tv-remote-control",
             promotionalText: "Try every remote feature free for one day, then keep access with one optional purchase. No ads, separate app account or subscription.",
             supportUrl: "https://worksbienstudios.com/customerservice",

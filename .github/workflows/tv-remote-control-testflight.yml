@@ -39,7 +39,7 @@ concurrency:
 env:
   IOS_BUNDLE_ID: com.worksbienstudios.clearmote
   APPLE_TEAM_ID: 49SQ3XQ68Q
-  APP_NAME: 'Remote for Vizio Smart TV'
+  APP_NAME: 'ClearMote: Remote for Vizio'
   APP_SKU: tv-remote-control-ios
   PROVISIONING_PROFILE_NAME: TV Remote Control App Store CI
   SCHEME: VizioRemote
