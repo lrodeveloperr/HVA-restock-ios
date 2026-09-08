@@ -4,8 +4,8 @@ Use these records only after the English source in `APP_STORE.md` is frozen. Con
 
 ## Spanish (Mexico)
 
-- Name: **Control Remoto para Vizio**
-- Subtitle: **Control WiFi y Teclado**
+- Name: **ClearMote: Control para Vizio**
+- Subtitle: **Smart TV WiFi y Teclado**
 - Promotional text: **Prueba todas las funciones gratis durante un día y conserva el acceso con una compra opcional. Sin anuncios, cuenta propia ni suscripción.**
 - Keywords: `volumen,entrada,canal,navegación,multimedia,encendido,botones,vinculación`
 
@@ -49,8 +49,8 @@ Esta es una app independiente, no afiliada ni respaldada por Vizio, Inc. Vizio y
 
 ## French (Canada)
 
-- Name: **Télécommande pour Vizio**
-- Subtitle: **Commande WiFi et Clavier**
+- Name: **ClearMote : Télécommande Vizio**
+- Subtitle: **Smart TV WiFi et Clavier**
 - Promotional text: **Essayez toutes les fonctions gratuitement pendant un jour, puis gardez l’accès avec un achat facultatif. Sans publicité, compte distinct ni abonnement.**
 - Keywords: `volume,entrée,chaîne,navigation,média,alimentation,boutons,jumelage`
 

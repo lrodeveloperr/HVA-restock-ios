@@ -1,4 +1,4 @@
-# Remote for Vizio Smart TV
+# ClearMote: Remote for Vizio
 
 A native SwiftUI remote for compatible Vizio SmartCast televisions. The app talks directly to the selected television over the local network; it has no developer-operated backend, advertising, analytics or account system.
 

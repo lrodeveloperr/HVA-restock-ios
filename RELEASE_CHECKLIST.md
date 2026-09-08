@@ -4,7 +4,7 @@ No release is approved until every BLOCKED item below has evidence attached to t
 
 ## Source and identity
 
-- [x] Search-led name **Remote for Vizio Smart TV** uses “for Vizio” solely to state compatibility; the app and listing retain an explicit independence disclaimer.
+- [x] Unique, search-led name **ClearMote: Remote for Vizio** uses “for Vizio” solely to state compatibility; the app and listing retain an explicit independence disclaimer.
 - [x] Bundle ID `com.worksbienstudios.clearmote` reconciled with product IDs.
 - [x] English, Spanish (Latin America) and French (Canada) string-key and placeholder parity checked statically.
 - [x] App has no third-party SDK or backend dependency in source.

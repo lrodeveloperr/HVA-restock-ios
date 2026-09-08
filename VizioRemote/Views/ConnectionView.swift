@@ -14,7 +14,7 @@ struct ConnectionView: View {
                     .accessibilityHidden(true)
 
                 VStack(spacing: 10) {
-                    Text("Remote for Vizio Smart TV")
+                    Text("ClearMote: Remote for Vizio")
                         .font(.largeTitle.bold())
                     Text("A simple remote for Vizio SmartCast TVs")
                         .font(.body)
@@ -89,7 +89,7 @@ struct ConnectionView: View {
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(Color.remoteBlue)
 
-                Text("Remote for Vizio Smart TV is an independent app and is not affiliated with or endorsed by Vizio, Inc.")
+                Text("ClearMote: Remote for Vizio is an independent app and is not affiliated with or endorsed by Vizio, Inc.")
                     .font(.caption2)
                     .foregroundStyle(Color.secondaryText)
                     .multilineTextAlignment(.center)
