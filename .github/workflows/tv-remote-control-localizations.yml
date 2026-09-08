@@ -1,0 +1,200 @@
+name: Configure TV Remote Control Localizations
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/tv-remote-control-localizations.yml
+
+permissions:
+  contents: read
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          repository: lrodeveloperr/HVA-restock-ios
+          ref: release/tv-remote-control
+      - name: Configure Spanish and Canadian French listing
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          missing=()
+          [[ -n "$ASC_KEY_ID" ]] || missing+=(ASC_KEY_ID)
+          [[ -n "$ASC_ISSUER_ID" ]] || missing+=(ASC_ISSUER_ID)
+          [[ -n "$ASC_PRIVATE_KEY" ]] || missing+=(ASC_PRIVATE_KEY)
+          (( ${#missing[@]} == 0 )) || { echo "Missing Actions secrets: ${missing[*]}" >&2; exit 1; }
+          key_path="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          umask 077
+          printf '%s' "$ASC_PRIVATE_KEY" > "$key_path"
+          export ASC_TOKEN="$(ruby Scripts/app-store-connect-jwt.rb "$key_path" "$ASC_KEY_ID" "$ASC_ISSUER_ID")"
+
+          ruby <<'RUBY'
+          require "json"
+          require "net/http"
+          require "uri"
+
+          APP_ID = "6809810611"
+          SUPPORT_URL = "https://worksbienstudios.com/customerservice"
+          MARKETING_URL = "https://worksbienstudios.com/apps/tv-remote-control"
+
+          LISTINGS = {
+            "es-MX" => {
+              name: "Control remoto de TV",
+              subtitle: "Controles Wi-Fi simples",
+              privacy_url: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/es/privacy/",
+              promotional_text: "Prueba todas las funciones gratis durante un día y conserva el acceso con una compra opcional. Sin anuncios, cuenta propia ni suscripción.",
+              keywords: "volumen,teclado,entrada,canal,navegación,multimedia,controlador,televisor inteligente",
+              description: <<~TEXT
+                Controla una TV Vizio SmartCast compatible desde tu iPhone o iPad a través de tu red local.
+
+                Control remoto de TV reúne los controles cotidianos: navegación, volumen, canales, selección de entrada, reproducción y entrada de texto latino básico. Usa la detección automática cuando esté disponible o introduce manualmente la dirección IPv4 local de la TV.
+
+                FUNCIONES
+
+                • Control direccional con un botón OK grande
+                • Volumen, silencio y canales
+                • Inicio, atrás, menú y selección de entrada
+                • Controles separados de Reproducir y Pausar; su disponibilidad varía según la app y el firmware de la TV
+                • Entrada de texto latino básico
+                • Conexión manual por IP
+                • TV de demostración integrada
+
+                PRUÉBALA Y PAGA UNA VEZ
+
+                Inicia la prueba gratis de 1 día para usar todas las funciones durante 24 horas. El acceso termina cuando finaliza la prueba. No se renueva ni genera cargos automáticos. Conserva el acceso con el desbloqueo completo opcional de pago único. App Store muestra el precio antes de confirmar. No hay suscripciones.
+
+                PRIVACIDAD DESDE EL DISEÑO
+
+                • Sin cuenta propia de la app, publicidad ni SDK de análisis
+                • Sin servicio en la nube operado por el desarrollador
+                • Los comandos viajan directamente entre este dispositivo y la TV seleccionada
+                • Los datos de la TV seleccionada, el token de vinculación y la identidad de seguridad se guardan en el llavero de iOS para este dispositivo
+
+                COMPATIBILIDAD
+
+                Requiere una TV Vizio SmartCast compatible y una red local funcional. El firmware, el modelo, el aislamiento de red y los ajustes de energía pueden afectar la disponibilidad. No se garantiza el encendido cuando la TV no está accesible. Las redes exclusivamente IPv6 no son compatibles actualmente; la TV debe tener una dirección IPv4 privada. Las TV Vizio Internet Apps anteriores no son compatibles.
+
+                Esta es una app independiente, no afiliada ni respaldada por Vizio, Inc. Vizio y SmartCast son marcas de su propietario y se mencionan únicamente para describir compatibilidad.
+              TEXT
+            },
+            "fr-CA" => {
+              name: "Télécommande TV",
+              subtitle: "Commandes Wi-Fi simples",
+              privacy_url: "https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/fr-ca/privacy/",
+              promotional_text: "Essayez toutes les fonctions gratuitement pendant un jour, puis gardez l’accès avec un achat facultatif. Sans publicité, compte distinct ni abonnement.",
+              keywords: "volume,clavier,entrée,chaîne,navigation,média,contrôleur,téléviseur intelligent",
+              description: <<~TEXT
+                Contrôlez un téléviseur Vizio SmartCast compatible depuis votre iPhone ou iPad sur votre réseau local.
+
+                Télécommande TV réunit les commandes courantes : navigation, volume, chaînes, sélection de l’entrée, lecture et saisie de texte latin de base. Utilisez la détection automatique lorsqu’elle est disponible ou entrez manuellement l’adresse IPv4 locale du téléviseur.
+
+                FONCTIONS
+
+                • Pavé directionnel avec un grand bouton OK
+                • Volume, sourdine et chaînes
+                • Accueil, retour, menu et sélection de l’entrée
+                • Commandes Lecture et Pause distinctes; leur disponibilité varie selon l’app et le micrologiciel du téléviseur
+                • Saisie de texte latin de base
+                • Connexion manuelle par IP
+                • Téléviseur de démonstration intégré
+
+                ESSAYEZ, PUIS PAYEZ UNE FOIS
+
+                Commencez l’essai gratuit de 1 jour pour utiliser toutes les fonctions pendant 24 heures. L’accès prend fin avec l’essai. Celui-ci ne se renouvelle pas et n’entraîne aucuns frais automatiques. Gardez l’accès grâce au déverrouillage complet facultatif à achat unique. L’App Store affiche le prix avant votre confirmation. Il n’y a aucun abonnement.
+
+                CONFIDENTIALITÉ INTÉGRÉE
+
+                • Aucun compte distinct pour l’app, aucune publicité et aucun module d’analyse
+                • Aucun service infonuagique exploité par le développeur
+                • Les commandes circulent directement entre cet appareil et le téléviseur sélectionné
+                • Les données du téléviseur sélectionné, le jeton de jumelage et son identité de sécurité sont stockés dans le trousseau iOS pour cet appareil
+
+                COMPATIBILITÉ
+
+                Un téléviseur Vizio SmartCast compatible et un réseau local fonctionnel sont requis. Le micrologiciel, le modèle, l’isolation du réseau et les réglages d’alimentation peuvent influer sur la disponibilité. La mise sous tension n’est pas garantie lorsque le téléviseur est inaccessible. Les réseaux IPv6 seulement ne sont pas pris en charge actuellement; le téléviseur doit avoir une adresse IPv4 privée. Les anciens téléviseurs Vizio Internet Apps ne sont pas pris en charge.
+
+                Cette app indépendante n’est ni affiliée à Vizio, Inc. ni approuvée par celle-ci. Vizio et SmartCast sont des marques de leur propriétaire et sont mentionnées uniquement pour décrire la compatibilité.
+              TEXT
+            }
+          }.freeze
+
+          def request(method, path, body = nil)
+            uri = URI("https://api.appstoreconnect.apple.com#{path}")
+            klass = { get: Net::HTTP::Get, post: Net::HTTP::Post, patch: Net::HTTP::Patch }.fetch(method)
+            req = klass.new(uri)
+            req["Authorization"] = "Bearer #{ENV.fetch("ASC_TOKEN")}" 
+            req["Content-Type"] = "application/json"
+            req["Accept"] = "application/json"
+            req.body = JSON.generate(body) if body
+            response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }
+            unless response.code.to_i.between?(200, 299)
+              abort "#{method.to_s.upcase} #{path} failed (#{response.code}): #{response.body}"
+            end
+            response.body.nil? || response.body.empty? ? {} : JSON.parse(response.body)
+          end
+
+          versions = request(:get, "/v1/apps/#{APP_ID}/appStoreVersions?filter%5Bplatform%5D=IOS&filter%5BversionString%5D=1.0&limit=200").fetch("data")
+          version = versions.find { |item| item.dig("attributes", "appStoreState") != "READY_FOR_SALE" } || versions.first
+          abort "App Store version 1.0 not found" unless version
+          version_id = version.fetch("id")
+
+          app_infos = request(:get, "/v1/apps/#{APP_ID}/appInfos?limit=200").fetch("data")
+          app_info = app_infos.find { |item| item.dig("attributes", "appStoreState") != "READY_FOR_SALE" } || app_infos.first
+          abort "Editable app info not found" unless app_info
+          app_info_id = app_info.fetch("id")
+
+          version_localizations = request(:get, "/v1/appStoreVersions/#{version_id}/appStoreVersionLocalizations?limit=200").fetch("data")
+          info_localizations = request(:get, "/v1/appInfos/#{app_info_id}/appInfoLocalizations?limit=200").fetch("data")
+
+          LISTINGS.each do |locale, listing|
+            info_attributes = {
+              name: listing.fetch(:name),
+              subtitle: listing.fetch(:subtitle),
+              privacyPolicyUrl: listing.fetch(:privacy_url)
+            }
+            existing_info = info_localizations.find { |item| item.dig("attributes", "locale") == locale }
+            if existing_info
+              request(:patch, "/v1/appInfoLocalizations/#{existing_info.fetch("id")}", {
+                data: { type: "appInfoLocalizations", id: existing_info.fetch("id"), attributes: info_attributes }
+              })
+            else
+              request(:post, "/v1/appInfoLocalizations", {
+                data: {
+                  type: "appInfoLocalizations",
+                  attributes: info_attributes.merge(locale: locale),
+                  relationships: { appInfo: { data: { type: "appInfos", id: app_info_id } } }
+                }
+              })
+            end
+
+            version_attributes = {
+              description: listing.fetch(:description),
+              keywords: listing.fetch(:keywords),
+              marketingUrl: MARKETING_URL,
+              promotionalText: listing.fetch(:promotional_text),
+              supportUrl: SUPPORT_URL
+            }
+            existing_version = version_localizations.find { |item| item.dig("attributes", "locale") == locale }
+            if existing_version
+              request(:patch, "/v1/appStoreVersionLocalizations/#{existing_version.fetch("id")}", {
+                data: { type: "appStoreVersionLocalizations", id: existing_version.fetch("id"), attributes: version_attributes }
+              })
+            else
+              request(:post, "/v1/appStoreVersionLocalizations", {
+                data: {
+                  type: "appStoreVersionLocalizations",
+                  attributes: version_attributes.merge(locale: locale),
+                  relationships: { appStoreVersion: { data: { type: "appStoreVersions", id: version_id } } }
+                }
+              })
+            end
+            puts "Configured #{locale} App Store listing"
+          end
+          puts "versionId=#{version_id} appInfoId=#{app_info_id}"
+          RUBY
