@@ -56,32 +56,21 @@ jobs:
             [response.code.to_i, response.body.nil? || response.body.empty? ? {} : JSON.parse(response.body)]
           end
 
-          _, points_payload = request(:get, "/v1/apps/#{APP_ID}/appPricePoints?filter%5Bterritory%5D=USA&limit=200")
-          free_point = points_payload.fetch("data").find do |item|
-            customer_price = item.dig("attributes", "customerPrice")
-            customer_price == "0" || customer_price == "0.00"
-          end
-          abort "No free USA app price point found" unless free_point
-          placeholder = "${price1}"
-          request(:post, "/v1/appPriceSchedules", {
-            data: {
-              type: "appPriceSchedules",
-              relationships: {
-                app: { data: { type: "apps", id: APP_ID } },
-                baseTerritory: { data: { type: "territories", id: "USA" } },
-                manualPrices: { data: [{ type: "appPrices", id: placeholder }] }
-              }
-            },
-            included: [{
-              type: "appPrices",
-              id: placeholder,
-              attributes: { startDate: nil },
-              relationships: {
-                appPricePoint: { data: { type: "appPricePoints", id: free_point.fetch("id") } }
-              }
-            }]
-          })
-          puts "Configured app as free with USA base territory"
+          price_status, price_schedule = request(
+            :get,
+            "/v1/apps/#{APP_ID}/appPriceSchedule",
+            allowed: [200, 404]
+          )
+          abort "The app does not have its expected free price record" unless price_status == 200
+          schedule_id = price_schedule.fetch("data").fetch("id")
+          manual_status, manual_prices = request(
+            :get,
+            "/v1/appPriceSchedules/#{schedule_id}/manualPrices?limit=200",
+            allowed: [200, 404]
+          )
+          has_manual_prices = manual_status == 200 && !manual_prices.fetch("data").empty?
+          abort "The base app unexpectedly has a paid price schedule" if has_manual_prices
+          puts "Verified the app is free; scheduleId=#{schedule_id}" 
 
           availability_status, availability = request(
             :get,
