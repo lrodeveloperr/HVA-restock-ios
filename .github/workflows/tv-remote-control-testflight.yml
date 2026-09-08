@@ -35,7 +35,7 @@ concurrency:
 env:
   IOS_BUNDLE_ID: com.worksbienstudios.clearmote
   APPLE_TEAM_ID: 49SQ3XQ68Q
-  APP_NAME: TV Remote Control
+  APP_NAME: 'TV Remote Control: Simple'
   APP_SKU: tv-remote-control-ios
   PROVISIONING_PROFILE_NAME: TV Remote Control App Store CI
   SCHEME: VizioRemote
@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           repository: lrodeveloperr/HVA-restock-ios
-          ref: 5c25ac76315180b900bb7a91893ff96d04483784
+          ref: 068b326c59e0d43204aa6fbd373f8a5827435a94
       - name: Confirm production upload
         env:
           CONFIRMATION: ${{ inputs.confirmation }}
