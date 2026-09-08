@@ -149,7 +149,6 @@ jobs:
           abort "Editable app info not found" unless app_info
           app_info_id = app_info.fetch("id")
 
-          version_localizations = request(:get, "/v1/appStoreVersions/#{version_id}/appStoreVersionLocalizations?limit=200").fetch("data")
           info_localizations = request(:get, "/v1/appInfos/#{app_info_id}/appInfoLocalizations?limit=200").fetch("data")
 
           LISTINGS.each do |locale, listing|
@@ -180,6 +179,7 @@ jobs:
               promotionalText: listing.fetch(:promotional_text),
               supportUrl: SUPPORT_URL
             }
+            version_localizations = request(:get, "/v1/appStoreVersions/#{version_id}/appStoreVersionLocalizations?limit=200").fetch("data")
             existing_version = version_localizations.find { |item| item.dig("attributes", "locale") == locale }
             if existing_version
               request(:patch, "/v1/appStoreVersionLocalizations/#{existing_version.fetch("id")}", {
