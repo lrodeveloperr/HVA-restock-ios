@@ -4,8 +4,8 @@ Status: **TestFlight build uploaded and Apple-validated; App Store review intent
 
 ## Product record
 
-- App Store name: **ClearMote: Remote for Vizio**
-- Subtitle: **Smart TV WiFi & Keyboard**
+- App Store name: **Remote for Vizio TV Controller**
+- Subtitle: **WiFi Keyboard, Volume & More**
 - Home Screen name: **TV Remote**
 - Bundle ID: `com.worksbienstudios.clearmote`
 - Version/build: release version / TestFlight build `2609081633.5`
@@ -21,7 +21,7 @@ Status: **TestFlight build uploaded and Apple-validated; App Store review intent
 - Supplemental terms URL: `https://lrodeveloperr.github.io/privacy-policy/tv-remote-control/terms/`
 - Terms: Apple Standard Licensed Application EULA plus the disclosures in `TERMS.md`
 
-The unique ClearMote brand distinguishes the app; “for Vizio” appears once as a compatibility statement and avoids logos, official claims or brand styling. Keep the independence disclaimer prominent and do not repeat third-party marks in the subtitle or keyword field.
+The exact-intent title covers remote, Vizio, TV and controller; “for Vizio” states compatibility and avoids logos, official claims or brand styling. Keep the independence disclaimer prominent and do not repeat third-party marks in the subtitle or keyword field.
 
 ## In-app purchases
 
@@ -72,7 +72,7 @@ TV Remote Control is an independent application and is not affiliated with or en
 
 ## Keywords
 
-`volume,input,channel,navigation,media,power,dpad,buttons,pairing,controller`
+`smart,input,channel,navigation,media,power,dpad,buttons,pairing`
 
 Do not repeat words from the title/subtitle and do not add vendor or competitor trademarks without approval. Re-check the live 100-character limit in App Store Connect.
 

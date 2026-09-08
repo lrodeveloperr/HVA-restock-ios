@@ -119,7 +119,7 @@ struct SettingsView: View {
     private var versionSummary: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
-        let format = String(localized: "ClearMote: Remote for Vizio %@ (%@)\nFree 1-day trial. Optional one-time unlock.\nNo ads or subscriptions. Independent and not affiliated with Vizio, Inc.")
+        let format = String(localized: "Remote for Vizio TV Controller %@ (%@)\nFree 1-day trial. Optional one-time unlock.\nNo ads or subscriptions. Independent and not affiliated with Vizio, Inc.")
         return String(format: format, version, build)
     }
 }
@@ -128,7 +128,7 @@ struct PrivacySummaryView: View {
     var body: some View {
         List {
             Section {
-                Text("ClearMote: Remote for Vizio does not collect, transmit, sell or share personal data with WorksBien Studios. It contains no advertising or analytics SDKs.")
+                Text("Remote for Vizio TV Controller does not collect, transmit, sell or share personal data with WorksBien Studios. It contains no advertising or analytics SDKs.")
             }
             Section("Stored on this device") {
                 Text("The selected TV address, display name, pairing token and TV certificate identity are stored in the iOS Keychain and marked device-only. The app-generated TV client identifier and haptic preference are stored in local preferences.")

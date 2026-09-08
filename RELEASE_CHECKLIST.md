@@ -4,7 +4,7 @@ No release is approved until every BLOCKED item below has evidence attached to t
 
 ## Source and identity
 
-- [x] Unique, search-led name **ClearMote: Remote for Vizio** uses “for Vizio” solely to state compatibility; the app and listing retain an explicit independence disclaimer.
+- [x] Apple-accepted, search-led name **Remote for Vizio TV Controller** covers the high-intent remote/Vizio/TV/controller tokens; “for Vizio” states compatibility and the app retains an explicit independence disclaimer.
 - [x] Bundle ID `com.worksbienstudios.clearmote` reconciled with product IDs.
 - [x] English, Spanish (Latin America) and French (Canada) string-key and placeholder parity checked statically.
 - [x] App has no third-party SDK or backend dependency in source.

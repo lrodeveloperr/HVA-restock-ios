@@ -1,4 +1,4 @@
-"ClearMote: Remote for Vizio" = "ClearMote: Control para Vizio";
+"Remote for Vizio TV Controller" = "Control Remoto TV Vizio: Mando";
 "TV Remote" = "Control remoto";
 "A simple remote for Vizio SmartCast TVs" = "Un control remoto sencillo para televisores Vizio SmartCast";
 "This device and TV on the same Wi-Fi" = "Este dispositivo y la TV deben estar en la misma red Wi-Fi";
@@ -10,7 +10,7 @@
 "FOUND ON YOUR NETWORK" = "ENCONTRADOS EN TU RED";
 "Enter IP Address" = "Ingresar dirección IP";
 "Try Demo TV" = "Probar TV de demostración";
-"ClearMote: Remote for Vizio is an independent app and is not affiliated with or endorsed by Vizio, Inc." = "ClearMote: Control para Vizio es una app independiente y no está afiliada ni respaldada por Vizio, Inc.";
+"Remote for Vizio TV Controller is an independent app and is not affiliated with or endorsed by Vizio, Inc." = "Control Remoto TV Vizio: Mando es una app independiente y no está afiliada ni respaldada por Vizio, Inc.";
 "Vizio TV" = "TV Vizio";
 "Vizio SmartCast TV" = "TV Vizio SmartCast";
 "Demo Living Room TV" = "TV de demostración de la sala";
@@ -52,12 +52,12 @@
 "Privacy Summary" = "Resumen de privacidad";
 "Customer Support" = "Atención al cliente";
 "Forget This TV" = "Olvidar esta TV";
-"ClearMote: Remote for Vizio %@ (%@)\nFree 1-day trial. Optional one-time unlock.\nNo ads or subscriptions. Independent and not affiliated with Vizio, Inc." = "ClearMote: Control para Vizio %@ (%@)\nPrueba gratis de 1 día. Desbloqueo opcional de pago único.\nSin anuncios ni suscripciones. App independiente y no afiliada a Vizio, Inc.";
+"Remote for Vizio TV Controller %@ (%@)\nFree 1-day trial. Optional one-time unlock.\nNo ads or subscriptions. Independent and not affiliated with Vizio, Inc." = "Control Remoto TV Vizio: Mando %@ (%@)\nPrueba gratis de 1 día. Desbloqueo opcional de pago único.\nSin anuncios ni suscripciones. App independiente y no afiliada a Vizio, Inc.";
 "Done" = "Listo";
 "Forget this TV?" = "¿Olvidar esta TV?";
 "Forget TV" = "Olvidar TV";
 "Cancel" = "Cancelar";
-"ClearMote: Remote for Vizio does not collect, transmit, sell or share personal data with WorksBien Studios. It contains no advertising or analytics SDKs." = "ClearMote: Control para Vizio no recopila, transmite, vende ni comparte datos personales con WorksBien Studios. No contiene publicidad ni SDK de análisis.";
+"Remote for Vizio TV Controller does not collect, transmit, sell or share personal data with WorksBien Studios. It contains no advertising or analytics SDKs." = "Control Remoto TV Vizio: Mando no recopila, transmite, vende ni comparte datos personales con WorksBien Studios. No contiene publicidad ni SDK de análisis.";
 "Local network" = "Red local";
 "Enter the TV PIN" = "Ingresa el PIN de la TV";
 "PIN" = "PIN";

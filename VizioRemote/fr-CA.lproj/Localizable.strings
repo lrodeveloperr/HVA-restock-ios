@@ -1,4 +1,4 @@
-"ClearMote: Remote for Vizio" = "ClearMote : Télécommande Vizio";
+"Remote for Vizio TV Controller" = "Vizio TV : Télécommande WiFi";
 "TV Remote" = "Télécommande TV";
 "A simple remote for Vizio SmartCast TVs" = "Une télécommande simple pour les téléviseurs Vizio SmartCast";
 "This device and TV on the same Wi-Fi" = "Cet appareil et le téléviseur doivent utiliser le même réseau Wi-Fi";
@@ -10,7 +10,7 @@
 "FOUND ON YOUR NETWORK" = "TROUVÉS SUR VOTRE RÉSEAU";
 "Enter IP Address" = "Saisir l’adresse IP";
 "Try Demo TV" = "Essayer le téléviseur démo";
-"ClearMote: Remote for Vizio is an independent app and is not affiliated with or endorsed by Vizio, Inc." = "ClearMote : Télécommande Vizio est une app indépendante qui n’est ni affiliée à Vizio, Inc. ni approuvée par celle-ci.";
+"Remote for Vizio TV Controller is an independent app and is not affiliated with or endorsed by Vizio, Inc." = "Vizio TV : Télécommande WiFi est une app indépendante qui n’est ni affiliée à Vizio, Inc. ni approuvée par celle-ci.";
 "Vizio TV" = "Téléviseur Vizio";
 "Vizio SmartCast TV" = "Téléviseur Vizio SmartCast";
 "Demo Living Room TV" = "Téléviseur démo du salon";
@@ -52,12 +52,12 @@
 "Privacy Summary" = "Résumé de la confidentialité";
 "Customer Support" = "Soutien à la clientèle";
 "Forget This TV" = "Oublier ce téléviseur";
-"ClearMote: Remote for Vizio %@ (%@)\nFree 1-day trial. Optional one-time unlock.\nNo ads or subscriptions. Independent and not affiliated with Vizio, Inc." = "ClearMote : Télécommande Vizio %@ (%@)\nEssai gratuit de 1 jour. Déverrouillage unique facultatif.\nSans publicité ni abonnement. App indépendante et non affiliée à Vizio, Inc.";
+"Remote for Vizio TV Controller %@ (%@)\nFree 1-day trial. Optional one-time unlock.\nNo ads or subscriptions. Independent and not affiliated with Vizio, Inc." = "Vizio TV : Télécommande WiFi %@ (%@)\nEssai gratuit de 1 jour. Déverrouillage unique facultatif.\nSans publicité ni abonnement. App indépendante et non affiliée à Vizio, Inc.";
 "Done" = "Terminé";
 "Forget this TV?" = "Oublier ce téléviseur?";
 "Forget TV" = "Oublier le téléviseur";
 "Cancel" = "Annuler";
-"ClearMote: Remote for Vizio does not collect, transmit, sell or share personal data with WorksBien Studios. It contains no advertising or analytics SDKs." = "ClearMote : Télécommande Vizio ne recueille, ne transmet, ne vend et ne partage aucune donnée personnelle avec WorksBien Studios. Elle ne contient aucune publicité ni aucun module d’analyse.";
+"Remote for Vizio TV Controller does not collect, transmit, sell or share personal data with WorksBien Studios. It contains no advertising or analytics SDKs." = "Vizio TV : Télécommande WiFi ne recueille, ne transmet, ne vend et ne partage aucune donnée personnelle avec WorksBien Studios. Elle ne contient aucune publicité ni aucun module d’analyse.";
 "Local network" = "Réseau local";
 "Enter the TV PIN" = "Saisir le NIP du téléviseur";
 "PIN" = "NIP";
