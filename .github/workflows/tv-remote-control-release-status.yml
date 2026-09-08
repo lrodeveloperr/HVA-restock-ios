@@ -106,3 +106,5 @@ jobs:
           if [[ "$availability_status" == 200 ]]; then
             ruby -rjson -e 'item=JSON.parse(File.read(ARGV[0])).fetch("data"); puts "appAvailabilityId=#{item["id"]} newTerritories=#{item.dig("attributes","availableInNewTerritories")}"' "$availability"
           fi
+
+# Status probe 2026-09-08T16:39:27.192Z
