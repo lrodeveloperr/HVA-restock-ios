@@ -1,36 +1,41 @@
-# Politique de confidentialité de Télécommande TV
+# Politique de confidentialité de Vizio TV : Télécommande WiFi
 
-**Date d’entrée en vigueur : 8 septembre 2026**
+**Entrée en vigueur :** 9 septembre 2026<br>
+**Nom anglais :** Remote for Vizio TV Controller
 
-Télécommande TV n’envoie aucun renseignement personnel à WorksBien Studios Inc. L’app ne comporte aucun compte exploité par le développeur, aucune publicité, aucun outil d’analyse, aucun suivi et aucun service infonuagique.
+Vizio TV : Télécommande WiFi n’envoie aucun renseignement personnel à WorksBien Studios Inc. L’app ne comporte aucun compte exploité par le développeur, aucune publicité, aucun outil d’analyse, aucun suivi, aucun nuage du développeur et aucun module externe de signalement des pannes.
 
 ## Réseau local
 
-L’app utilise le réseau local pour trouver un téléviseur compatible et communiquer directement avec celui-ci. Les réponses de détection sont des données réseau non fiables. L’utilisateur choisit un téléviseur et termine le jumelage au moyen du NIP affiché avant de le contrôler. Les commandes et le texte saisi circulent de l’appareil Apple au téléviseur sélectionné; WorksBien Studios ne les reçoit pas. Le logiciel du fabricant traite ce trafic selon ses propres pratiques.
+L’app utilise le réseau local pour détecter un téléviseur compatible choisi par l’utilisateur et communiquer directement avec lui. Elle peut traiter son adresse IPv4 privée, son port, son nom et son identifiant. L’utilisateur choisit le téléviseur et termine le jumelage au moyen du NIP affiché avant de le contrôler. Les commandes et le texte saisi circulent de l’appareil Apple au téléviseur; WorksBien Studios ne les reçoit pas. Apple, le réseau et le fabricant peuvent traiter des données séparément selon leurs pratiques.
+
 
 Lors du premier jumelage, les téléviseurs compatibles présentent un certificat local autosigné qui ne peut pas être vérifié par une autorité de certification publique pour l’adresse privée du téléviseur. L’app fait temporairement confiance uniquement au point d’accès privé sélectionné pour l’échange du NIP affiché à l’écran, puis enregistre cette identité de certificat lorsque le NIP est accepté. Cette mesure protège la continuité des connexions suivantes, mais elle ne peut pas établir indépendamment l’identité du téléviseur contre un attaquant actif lors du premier jumelage. Jumelez seulement sur un réseau privé auquel vous faites confiance.
 
 ## Données enregistrées sur l’appareil
 
-L’adresse IPv4 privée, le port et le nom du téléviseur sélectionné, le jeton de jumelage émis par le téléviseur et l’identité de son certificat sont stockés comme éléments réservés à cet appareil dans le trousseau iOS. L’UUID client généré par l’app et la préférence de retour haptique sont conservés dans les préférences locales. **Oublier ce téléviseur** demande la suppression de l’adresse, du jeton et de l’identité d’un téléviseur. **Supprimer toutes les données de téléviseur** demande la suppression de toutes les adresses, de tous les jetons et certificats ainsi que de l’UUID client généré par l’app. Une commande distincte permet de réinitialiser l’identité lorsque le certificat du téléviseur change.
+L’adresse IPv4 privée, le port et le nom du téléviseur sélectionné, le jeton de jumelage et l’identité de son certificat sont stockés comme éléments réservés à l’appareil dans le trousseau iOS. L’UUID client généré par l’app et la préférence haptique sont conservés localement.
 
-## Achats
+**Oublier ce téléviseur** demande la suppression des données d’un téléviseur. **Supprimer toutes les données de téléviseur** demande la suppression de toutes les adresses, de tous les jetons et certificats ainsi que de l’UUID client. Si le certificat du téléviseur change, utilisez **Oublier ce téléviseur** (ou **Supprimer toutes les données de téléviseur**), puis refaites le jumelage uniquement sur un réseau privé de confiance.
 
-Apple traite l’essai gratuit de 1 jour et le déverrouillage complet facultatif à achat unique. L’app consulte dans StoreKit l’identifiant et le type de produit vérifiés, la date d’achat, l’état actuel du droit ou de la révocation et le prix localisé afin de déterminer si la télécommande est accessible. L’essai dure 24 heures, ne se renouvelle pas et n’entraîne aucuns frais automatiques. Le développeur ne reçoit aucun renseignement de carte de paiement.
+## Achats, diagnostics et soutien
 
-## Communication et conservation
+Apple traite l’Essai de 1 jour gratuit et le Déverrouillage complet facultatif à achat unique. L’app consulte le produit, le type, la date d’achat, le droit ou la révocation et le prix localisé vérifiés par StoreKit. L’essai dure 24 heures, ne se renouvelle pas et n’entraîne aucuns frais automatiques. WorksBien Studios ne reçoit aucun renseignement complet de carte ou de compte bancaire.
 
-WorksBien Studios ne reçoit, ne vend et ne partage pas les données locales décrites. Elles demeurent sur l’appareil jusqu’à ce que l’utilisateur emploie les commandes de suppression, qu’iOS retire le stockage applicable ou que l’appareil soit effacé. Apple et le fabricant du téléviseur peuvent traiter des données séparément dans le cadre de leurs services ou appareils.
+Apple peut traiter des diagnostics et des données TestFlight selon ses conditions et réglages. Si vous communiquez avec le soutien, nous recevons votre adresse courriel et les renseignements envoyés. N’envoyez pas de justificatifs, de jetons, d’adresses privées ni de contenu sensible.
 
-## Enfants
+## Communication, conservation et droits
 
-L’app n’est pas conçue pour recueillir des renseignements sur les enfants et n’envoie sciemment aucun renseignement d’utilisateur à WorksBien Studios.
+WorksBien Studios ne reçoit, ne vend et ne partage pas les données locales décrites, et ne les utilise pas pour le suivi entre apps. Elles demeurent sur l’appareil jusqu’à l’emploi des commandes de suppression, le retrait du stockage par iOS, la désinstallation selon le comportement du trousseau ou l’effacement de l’appareil.
+
+WorksBien Studios ne peut accéder à des renseignements qu’elle ne reçoit pas, ni les corriger ou les supprimer. Utilisez les commandes de l’app pour les données locales. Pour les renseignements réellement détenus par WorksBien Studios, écrivez à **info@worksbienstudios.com**.
+
+L’app ne s’adresse pas aux enfants. Aucun appareil ni réseau n’est entièrement sécurisé. Utilisez seulement les téléviseurs et réseaux que vous êtes autorisé à contrôler.
 
 ## Modifications et coordonnées
 
-Les modifications importantes seront indiquées par la mise à jour de la politique et de sa date d’entrée en vigueur.
+Nous pouvons modifier cette politique lorsque l’app, la loi ou les pratiques de données changent. La version courante paraît à cette URL.
 
-WorksBien Studios Inc.  
-`https://worksbienstudios.com/customerservice`
+Responsable de la confidentialité : **WorksBien Studios Inc.**, **info@worksbienstudios.com**. [Service à la clientèle](https://worksbienstudios.com/customerservice).
 
-Télécommande TV est indépendante et n’est ni affiliée à Vizio, Inc. ni approuvée par celle-ci.
+Vizio TV : Télécommande WiFi est indépendante et n’est ni affiliée à Vizio, Inc. ni approuvée par celle-ci.
