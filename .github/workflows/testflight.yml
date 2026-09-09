@@ -1,6 +1,8 @@
 name: Remote for Vizio TV Controller TestFlight
 
 on:
+  push:
+    branches: [testflight-bonjour-upload]
   workflow_dispatch:
     inputs:
       confirmation:
@@ -55,7 +57,11 @@ jobs:
         env:
           CONFIRMATION: ${{ inputs.confirmation }}
         run: |
-          [[ "$CONFIRMATION" == "UPLOAD TV REMOTE" ]] || { echo 'Confirmation must exactly match UPLOAD TV REMOTE.' >&2; exit 1; }
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            [[ "$CONFIRMATION" == "UPLOAD TV REMOTE" ]] || { echo 'Confirmation must exactly match UPLOAD TV REMOTE.' >&2; exit 1; }
+          else
+            [[ "$GITHUB_REF_NAME" == "testflight-bonjour-upload" ]]
+          fi
           build_number="$(date -u +%y%m%d%H%M).${GITHUB_RUN_NUMBER}"
           echo "BUILD_NUMBER=$build_number" >> "$GITHUB_ENV"
       - name: Select Xcode
