@@ -134,8 +134,6 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k "$keychain_password" "$keychain_path"
           security list-keychains -d user -s "$keychain_path" $(security list-keychains -d user | tr -d '"')
           security find-identity -v -p codesigning "$keychain_path" | grep 'Apple Distribution'
-          signing_certificate_sha1="$(security find-identity -v -p codesigning "$keychain_path" | awk '/Apple Distribution/ {print $2; exit}')"
-          [[ "$signing_certificate_sha1" =~ ^[0-9A-F]{40}$ ]] || { echo "Could not resolve the imported distribution certificate." >&2; exit 1; }
           profile_json="$RUNNER_TEMP/profiles.json"
           auth="Authorization: Bearer $ASC_JWT"
           curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode "filter[name]=$PROVISIONING_PROFILE_NAME" --data-urlencode 'filter[profileState]=ACTIVE' --data-urlencode 'limit=200' 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
@@ -147,7 +145,7 @@ jobs:
             BUNDLE_RESOURCE_ID="$BUNDLE_RESOURCE_ID" CERTIFICATE_ID="$certificate_id" ruby -rjson -e 'puts JSON.generate(data:{type:"profiles",attributes:{name:ENV.fetch("PROVISIONING_PROFILE_NAME"),profileType:"IOS_APP_STORE"},relationships:{bundleId:{data:{type:"bundleIds",id:ENV.fetch("BUNDLE_RESOURCE_ID")}},certificates:{data:[{type:"certificates",id:ENV.fetch("CERTIFICATE_ID")}]}}})' > "$RUNNER_TEMP/create-profile.json"
             curl --fail-with-body --silent --show-error -X POST -H "$auth" -H 'Content-Type: application/json' -d @"$RUNNER_TEMP/create-profile.json" 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
           fi
-          ruby -rjson -rbase64 -rtime -e 'doc=JSON.parse(File.read(ARGV[0])); raw=doc.fetch("data"); data=raw.is_a?(Array) ? raw : [raw]; data.sort_by{|item| Time.parse(item.dig("attributes", "expirationDate"))}.reverse_each.with_index{|item,index| path=File.join(ARGV[1], "candidate-profile-#{index}.mobileprovision"); File.binwrite(path, Base64.decode64(item.fetch("attributes").fetch("profileContent"))); puts path}' "$profile_json" "$RUNNER_TEMP" > "$RUNNER_TEMP/profile-candidates.txt"
+          PROVISIONING_PROFILE_NAME="$PROVISIONING_PROFILE_NAME" ruby -rjson -rbase64 -rtime -e 'doc=JSON.parse(File.read(ARGV[0])); raw=doc.fetch("data"); data=raw.is_a?(Array) ? raw : [raw]; expected=ENV.fetch("PROVISIONING_PROFILE_NAME"); data.sort_by{|item| [item.dig("attributes", "name") == expected ? 0 : 1, -Time.parse(item.dig("attributes", "expirationDate")).to_i]}.each_with_index{|item,index| path=File.join(ARGV[1], "candidate-profile-#{index}.mobileprovision"); File.binwrite(path, Base64.decode64(item.fetch("attributes").fetch("profileContent"))); puts path}' "$profile_json" "$RUNNER_TEMP" > "$RUNNER_TEMP/profile-candidates.txt"
           profile_path=""
           fallback_profile_path=""
           while IFS= read -r candidate; do
@@ -155,14 +153,11 @@ jobs:
             security cms -D -i "$candidate" > "$candidate_plist"
             candidate_app_identifier="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$candidate_plist" 2>/dev/null || true)"
             candidate_multicast="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:com.apple.developer.networking.multicast' "$candidate_plist" 2>/dev/null || true)"
-            candidate_json="$candidate.json"
-            plutil -convert json -o "$candidate_json" "$candidate_plist"
-            candidate_certificate_match="$(SIGNING_CERTIFICATE_SHA1="$signing_certificate_sha1" ruby -rjson -rbase64 -ropenssl -e 'doc=JSON.parse(File.read(ARGV[0])); expected=ENV.fetch("SIGNING_CERTIFICATE_SHA1"); matches=doc.fetch("DeveloperCertificates", []).any?{|encoded| OpenSSL::Digest::SHA1.hexdigest(Base64.decode64(encoded)).upcase == expected}; puts(matches ? "true" : "false")' "$candidate_json")"
-            if [[ "$candidate_app_identifier" == "$APPLE_TEAM_ID.$IOS_BUNDLE_ID" && "$candidate_certificate_match" == "true" && -z "$fallback_profile_path" ]]; then
+            if [[ "$candidate_app_identifier" == "$APPLE_TEAM_ID.$IOS_BUNDLE_ID" && -z "$fallback_profile_path" ]]; then
               fallback_profile_path="$candidate"
               cp "$candidate_plist" "$RUNNER_TEMP/fallback-profile.plist"
             fi
-            if [[ "$candidate_app_identifier" == "$APPLE_TEAM_ID.$IOS_BUNDLE_ID" && "$candidate_certificate_match" == "true" && "$candidate_multicast" == "true" ]]; then
+            if [[ "$candidate_app_identifier" == "$APPLE_TEAM_ID.$IOS_BUNDLE_ID" && "$candidate_multicast" == "true" ]]; then
               profile_path="$candidate"
               cp "$candidate_plist" "$RUNNER_TEMP/profile.plist"
               echo "HAS_MULTICAST_ENTITLEMENT=true" >> "$GITHUB_ENV"
