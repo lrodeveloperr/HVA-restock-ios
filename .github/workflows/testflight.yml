@@ -136,7 +136,7 @@ jobs:
           security find-identity -v -p codesigning "$keychain_path" | grep 'Apple Distribution'
           profile_json="$RUNNER_TEMP/profiles.json"
           auth="Authorization: Bearer $ASC_JWT"
-          curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode "filter[name]=$PROVISIONING_PROFILE_NAME" --data-urlencode 'filter[profileState]=ACTIVE' --data-urlencode 'limit=2' 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
+          curl --fail-with-body --silent --show-error --get -H "$auth" --data-urlencode "filter[name]=$PROVISIONING_PROFILE_NAME" --data-urlencode 'filter[profileState]=ACTIVE' --data-urlencode 'limit=200' 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
           profile_count="$(ruby -rjson -e 'puts JSON.parse(File.read(ARGV[0])).fetch("data").length' "$profile_json")"
           if [[ "$profile_count" == "0" ]]; then
             cert_json="$RUNNER_TEMP/certificates.json"
@@ -144,21 +144,27 @@ jobs:
             certificate_id="$(ruby -rjson -rtime -e 'data=JSON.parse(File.read(ARGV[0])).fetch("data"); cert=data.select{|x| %w[DISTRIBUTION IOS_DISTRIBUTION].include?(x.dig("attributes","certificateType")) && Time.parse(x.dig("attributes","expirationDate")) > Time.now}.max_by{|x| Time.parse(x.dig("attributes","expirationDate"))}; abort "No active iOS distribution certificate in Apple account" unless cert; puts cert.fetch("id")' "$cert_json")"
             BUNDLE_RESOURCE_ID="$BUNDLE_RESOURCE_ID" CERTIFICATE_ID="$certificate_id" ruby -rjson -e 'puts JSON.generate(data:{type:"profiles",attributes:{name:ENV.fetch("PROVISIONING_PROFILE_NAME"),profileType:"IOS_APP_STORE"},relationships:{bundleId:{data:{type:"bundleIds",id:ENV.fetch("BUNDLE_RESOURCE_ID")}},certificates:{data:[{type:"certificates",id:ENV.fetch("CERTIFICATE_ID")}]}}})' > "$RUNNER_TEMP/create-profile.json"
             curl --fail-with-body --silent --show-error -X POST -H "$auth" -H 'Content-Type: application/json' -d @"$RUNNER_TEMP/create-profile.json" 'https://api.appstoreconnect.apple.com/v1/profiles' -o "$profile_json"
-          elif [[ "$profile_count" != "1" ]]; then
-            echo "Provisioning profile lookup was ambiguous." >&2
+          fi
+          ruby -rjson -rbase64 -rtime -e 'doc=JSON.parse(File.read(ARGV[0])); raw=doc.fetch("data"); data=raw.is_a?(Array) ? raw : [raw]; data.sort_by{|item| Time.parse(item.dig("attributes", "expirationDate"))}.reverse_each.with_index{|item,index| path=File.join(ARGV[1], "candidate-profile-#{index}.mobileprovision"); File.binwrite(path, Base64.decode64(item.fetch("attributes").fetch("profileContent"))); puts path}' "$profile_json" "$RUNNER_TEMP" > "$RUNNER_TEMP/profile-candidates.txt"
+          profile_path=""
+          while IFS= read -r candidate; do
+            candidate_plist="$candidate.plist"
+            security cms -D -i "$candidate" > "$candidate_plist"
+            candidate_app_identifier="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$candidate_plist" 2>/dev/null || true)"
+            candidate_multicast="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:com.apple.developer.networking.multicast' "$candidate_plist" 2>/dev/null || true)"
+            if [[ "$candidate_app_identifier" == "$APPLE_TEAM_ID.$IOS_BUNDLE_ID" && "$candidate_multicast" == "true" ]]; then
+              profile_path="$candidate"
+              cp "$candidate_plist" "$RUNNER_TEMP/profile.plist"
+              break
+            fi
+          done < "$RUNNER_TEMP/profile-candidates.txt"
+          if [[ -z "$profile_path" ]]; then
+            echo "No active provisioning profile matches the app and multicast entitlement." >&2
             exit 1
           fi
-          profile_path="$RUNNER_TEMP/app-store.mobileprovision"
-          ruby -rjson -rbase64 -e 'doc=JSON.parse(File.read(ARGV[0])); data=doc.fetch("data"); data=data.fetch(0) if data.is_a?(Array); print Base64.decode64(data.fetch("attributes").fetch("profileContent"))' "$profile_json" > "$profile_path"
-          security cms -D -i "$profile_path" > "$RUNNER_TEMP/profile.plist"
           profile_uuid="$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profile.plist")"
           app_identifier="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$RUNNER_TEMP/profile.plist")"
           [[ "$app_identifier" == "$APPLE_TEAM_ID.$IOS_BUNDLE_ID" ]]
-          profile_multicast="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:com.apple.developer.networking.multicast' "$RUNNER_TEMP/profile.plist" 2>/dev/null || true)"
-          if [[ "$profile_multicast" != "true" ]]; then
-            echo "Provisioning profile is missing the multicast entitlement." >&2
-            exit 1
-          fi
           mkdir -p "$HOME/Library/MobileDevice/Provisioning Profiles"
           cp "$profile_path" "$HOME/Library/MobileDevice/Provisioning Profiles/$profile_uuid.mobileprovision"
           echo "SIGNING_KEYCHAIN=$keychain_path" >> "$GITHUB_ENV"
