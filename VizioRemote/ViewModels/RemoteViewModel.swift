@@ -13,7 +13,6 @@ final class RemoteViewModel: ObservableObject {
     @Published var alertMessage: String?
     @Published var showSettings = false
     @Published var showTextEntry = false
-    @Published var showManualEntry = false
 
     private let discovery: TVDiscovering
     private let realService: SmartCastServicing
@@ -53,7 +52,7 @@ final class RemoteViewModel: ObservableObject {
     }
 
     init(
-        discovery: TVDiscovering = SSDPDiscovery(),
+        discovery: TVDiscovering = BonjourDiscovery(),
         realService: SmartCastServicing = SmartCastService(),
         demoService: SmartCastServicing = DemoSmartCastService(),
         deviceStore: DeviceStoring = DeviceStore(),
@@ -123,7 +122,7 @@ final class RemoteViewModel: ObservableObject {
         discoveryTask = Task { [weak self] in
             guard let self else { return }
             do {
-                let devices = try await discovery.discover(timeout: 3)
+                let devices = try await discovery.discover(timeout: 4)
                 guard !Task.isCancelled else { return }
                 discoveredDevices = devices
                 connectionState = .disconnected
@@ -134,22 +133,6 @@ final class RemoteViewModel: ObservableObject {
                 alertMessage = message(for: error)
             }
         }
-    }
-
-    func connectManually(ipAddress: String, legacyPort: Bool) {
-        guard !isManagingLocalData else { return }
-        guard let host = LocalNetworkAddress.normalizedIPv4(ipAddress) else {
-            alertMessage = SmartCastError.invalidAddress.localizedDescription
-            return
-        }
-        let device = TVDevice(
-            id: "smartcast-\(host):\(legacyPort ? 9000 : 7345)",
-            name: String(localized: "Vizio SmartCast TV"),
-            host: host,
-            port: legacyPort ? 9000 : 7345
-        )
-        showManualEntry = false
-        beginPairing(with: device)
     }
 
     func beginPairing(with selectedDevice: TVDevice) {
@@ -368,13 +351,9 @@ final class RemoteViewModel: ObservableObject {
         }
     }
 
-    func resetSecurityIdentity(ipAddress: String, legacyPort: Bool) {
+    func resetSavedSecurityIdentity() {
         guard !isManagingLocalData else { return }
-        guard let host = LocalNetworkAddress.normalizedIPv4(ipAddress) else {
-            alertMessage = SmartCastError.invalidAddress.localizedDescription
-            return
-        }
-        let target = TVDevice(name: "Security reset", host: host, port: legacyPort ? 9000 : 7345)
+        guard let target = device, !target.isDemo else { return }
         isManagingLocalData = true
         suspend()
         Task { [weak self] in
@@ -433,7 +412,6 @@ final class RemoteViewModel: ObservableObject {
         pairingOperationID = nil
         isCompletingPairing = false
         showTextEntry = false
-        showManualEntry = false
         showSettings = false
         cachedToken = nil
         pairingChallenge = nil

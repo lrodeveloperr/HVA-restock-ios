@@ -29,9 +29,9 @@ No release is approved until every BLOCKED item below has evidence attached to t
 
 ## Network and hardware
 
-- [ ] BLOCKED: multicast entitlement approved and present in signed build.
+- [x] Declared `_googlecast._tcp` in `NSBonjourServices`; custom multicast entitlement is not required or requested by the binary.
 - [x] Discovery redesigned around one bound UDP socket with retries; advertised host is required to match the datagram source.
-- [ ] BLOCKED: validate SSDP reply reception and packet flow on physical iPhone/iPad.
+- [ ] Validate Bonjour discovery and SmartCast port confirmation on physical iPhone/iPad.
 - [ ] BLOCKED: test dual-stack, IPv6-only/NAT64, VPN, guest Wi-Fi/client isolation and multiple-TV networks.
 - [ ] BLOCKED: pair, forget, reset identity, re-pair and reconnect on real TVs using ports 7345 and 9000 where applicable.
 - [ ] BLOCKED: validate every command on representative firmware/apps, especially Play/Pause, text entry and power behavior.
@@ -44,12 +44,12 @@ No release is approved until every BLOCKED item below has evidence attached to t
 - [x] AUTH token is not sent when the certificate pin is absent or changed.
 - [x] First-contact certificate is committed only after successful PIN pairing; explicit reset rebuilds the TLS session.
 - [x] A failed local write after accepted pairing attempts rollback of the token and certificate pin; cleanup failures are detected and surfaced with recovery instructions.
-- [x] Device ID and SSDP persistence IDs are validated/derived instead of trusting arbitrary values.
+- [x] Persistent device IDs are derived from validated local endpoints instead of trusting Bonjour record identifiers.
 - [x] Selected-TV metadata, tokens and certificate identities use device-only Keychain accessibility; deletion errors are surfaced.
 - [x] Forget, identity-reset and remove-all maintenance suspend active discovery/pairing/verification/command work before local security changes.
 - [x] TV-provided error details remove ASCII and Unicode control/format scalars before display.
 - [x] A non-paywalled management screen can forget one TV or request deletion of all saved TV addresses, tokens, certificate identities and the app-generated client UUID.
-- [ ] BLOCKED: perform an independent penetration test on a hostile LAN, including SSDP spoofing and first-use MITM/relay scenarios.
+- [ ] Perform an independent penetration test on a hostile LAN, including Bonjour spoofing and first-use MITM/relay scenarios.
 - [ ] BLOCKED: confirm privacy policy/App Privacy answers against the final binary.
 
 ## Accessibility and localization

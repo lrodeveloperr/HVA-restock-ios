@@ -85,11 +85,6 @@ struct ConnectionView: View {
                 .buttonStyle(OnboardingSecondaryButtonStyle())
                 .disabled(model.isBusy)
 
-                Button("Enter IP Address") { model.showManualEntry = true }
-                    .font(.subheadline.weight(.medium))
-                    .foregroundStyle(Color.remoteBlue)
-                    .disabled(model.isBusy)
-
                 Text("Try the demo instantly. Your real-TV trial starts only after you confirm.")
                     .font(.caption)
                     .foregroundStyle(Color.secondaryText)

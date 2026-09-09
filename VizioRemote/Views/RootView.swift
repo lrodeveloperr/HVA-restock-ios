@@ -55,10 +55,6 @@ struct RootView: View {
         .onChange(of: model.device) { _, _ in
             reconcileAccess()
         }
-        .sheet(isPresented: $model.showManualEntry) {
-            ManualEntryView(model: model)
-                .presentationDetents([.medium, .large])
-        }
         .sheet(isPresented: $model.showSettings) {
             SettingsView(model: model, purchases: purchases)
         }
@@ -85,7 +81,17 @@ struct RootView: View {
                 get: { model.alertMessage != nil },
                 set: { if !$0 { model.alertMessage = nil } }
             ),
-            actions: { Button("OK", role: .cancel) { model.alertMessage = nil } },
+            actions: {
+                if model.alertMessage == SmartCastError.noDeviceFound.localizedDescription {
+                    Button("Try Again") {
+                        model.alertMessage = nil
+                        model.discover()
+                    }
+                    Button("Close", role: .cancel) { model.alertMessage = nil }
+                } else {
+                    Button("OK", role: .cancel) { model.alertMessage = nil }
+                }
+            },
             message: { Text(model.alertMessage ?? "") }
         )
     }

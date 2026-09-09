@@ -49,7 +49,7 @@ FEATURES
 • Home, back, menu and input controls  
 • Separate Play and Pause controls (availability varies by TV app and firmware)  
 • Basic Latin keyboard entry  
-• Manual IP fallback  
+• Automatic same-Wi-Fi discovery
 • Built-in Demo TV for exploring the interface
 
 TRY IT, THEN PAY ONCE
@@ -88,7 +88,7 @@ Review path:
 4. Exercise the remote buttons and basic text entry.
 5. Open Settings to test **Restore Purchases**, **Forget This TV** or **Remove All Saved TV Data**.
 
-The optional **Full Remote Unlock** is a separate one-time non-consumable. There are no subscriptions, ads, separate app accounts or backend servers. Automatic discovery uses SSDP multicast; manual private-IPv4 entry is available. The multicast entitlement must be present in the submitted build.
+The optional **Full Remote Unlock** is a separate one-time non-consumable. There are no subscriptions, ads, separate app accounts or backend servers. Automatic discovery browses the declared `_googlecast._tcp` Bonjour service and confirms a compatible SmartCast control port. There is no manual-address setup and no custom multicast entitlement.
 
 ## App Privacy answers
 
@@ -103,7 +103,7 @@ The app uses Apple URLSession/TLS and Keychain APIs and contains no custom crypt
 ## Screenshot plan
 
 - iPhone and iPad: purchase screen with exact trial/no-auto-charge/one-time-unlock disclosure
-- iPhone and iPad: connection screen with Find My TV, manual IP and Demo TV
+- iPhone and iPad: connection screen with Find My TV and Demo TV
 - iPhone and iPad: main remote
 - iPhone and iPad: keyboard/settings as useful
 - Localize visible copy for Spanish (Mexico) and French (Canada)

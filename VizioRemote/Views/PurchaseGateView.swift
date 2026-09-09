@@ -240,8 +240,6 @@ struct PurchaseGateView: View {
 
 private struct LocalDataManagementView: View {
     @ObservedObject var model: RemoteViewModel
-    @State private var ipAddress = ""
-    @State private var legacyPort = false
     @State private var confirmForget = false
     @State private var confirmReset = false
     @State private var confirmRemoveAll = false
@@ -265,14 +263,8 @@ private struct LocalDataManagementView: View {
             }
 
             Section {
-                TextField(text: $ipAddress, prompt: Text(verbatim: "192.168.1.25")) {
-                    Text("TV address")
-                }
-                    .keyboardType(.decimalPad)
-                    .textContentType(.URL)
-                Toggle("Older firmware (port 9000)", isOn: $legacyPort)
                 Button("Reset Saved TV Identity", role: .destructive) { confirmReset = true }
-                    .disabled(ipAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.isManagingLocalData)
+                    .disabled(model.device?.isDemo != false || model.isManagingLocalData)
                 Button("Remove All Saved TV Data", role: .destructive) { confirmRemoveAll = true }
                     .disabled(model.isManagingLocalData)
             } header: {
@@ -283,18 +275,13 @@ private struct LocalDataManagementView: View {
         }
         .navigationTitle("Manage Local Data")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            guard let device = model.device, !device.isDemo else { return }
-            ipAddress = device.host
-            legacyPort = device.port == 9000
-        }
         .confirmationDialog("Forget this TV?", isPresented: $confirmForget, titleVisibility: .visible) {
             Button("Forget TV", role: .destructive) { model.forgetTV() }
             Button("Cancel", role: .cancel) {}
         }
         .confirmationDialog("Reset the saved identity for this address?", isPresented: $confirmReset, titleVisibility: .visible) {
             Button("Reset TV Identity", role: .destructive) {
-                model.resetSecurityIdentity(ipAddress: ipAddress, legacyPort: legacyPort)
+                model.resetSavedSecurityIdentity()
             }
             Button("Cancel", role: .cancel) {}
         } message: {

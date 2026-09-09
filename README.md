@@ -16,7 +16,7 @@ The trial does not renew and does not automatically charge. Eligible purchases c
 1. Open `VizioRemote.xcodeproj` in Xcode 16 or later.
 2. Select the `VizioRemote` target and confirm bundle ID `com.worksbienstudios.clearmote`, signing team and version.
 3. Open `Products.storekit` and confirm both non-consumables validate.
-4. Obtain Apple's multicast-networking entitlement for the production App ID before relying on automatic SSDP discovery.
+4. Test declared `_googlecast._tcp` Bonjour discovery and SmartCast port confirmation on physical Vizio hardware.
 5. Run unit tests and StoreKit tests on iPhone and iPad destinations.
 6. Run on a physical iPhone/iPad and a representative compatible TV before making hardware claims.
 
@@ -30,15 +30,15 @@ The built-in **Try Demo TV** path uses PIN `1234` and exercises pairing, buttons
 python3 MockTV/mock_smartcast.py --self-test
 ```
 
-These checks do not prove that SSDP, self-signed TLS, pairing or commands work on real firmware.
+These checks do not prove that Bonjour discovery, self-signed TLS, pairing or commands work on real firmware.
 
 ## Security and limitations
 
 - Only canonical private IPv4 addresses and SmartCast ports 7345/9000 are accepted.
 - Redirects are rejected, responses are bounded, commands use a bounded FIFO, and selected-TV metadata, tokens and TV certificate pins are device-only Keychain items.
 - The first PIN pairing uses trust-on-first-use for the TV's self-signed certificate; later certificate changes are blocked until the user explicitly resets the saved identity.
-- SSDP is an untrusted hint. A user must recognize and select the TV, and successful PIN pairing is required.
-- IPv6-only/NAT64 behavior, multicast reply handling, command mappings, power-state behavior and firmware coverage remain physical-device release gates.
+- Bonjour records are untrusted hints. A discovered host must expose a supported SmartCast port, the user must recognize and select the TV, and successful PIN pairing is required.
+- IPv6-only/NAT64 behavior, Bonjour availability, command mappings, power-state behavior and firmware coverage remain physical-device release gates.
 - Vizio's local SmartCast API is not a vendor-supported public SDK and may change.
 
 No third-party source code is vendored. Request shapes were independently implemented with public protocol references, including `exiva/Vizio_SmartCast_API`.
