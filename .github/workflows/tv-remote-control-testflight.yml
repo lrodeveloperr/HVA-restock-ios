@@ -179,6 +179,7 @@ jobs:
           cp "$profile_path" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles/$profile_uuid.mobileprovision"
           echo "SIGNING_KEYCHAIN=$keychain_path" >> "$GITHUB_ENV"
           echo "PROFILE_UUID=$profile_uuid" >> "$GITHUB_ENV"
+          echo "PROVISIONING_PROFILE_NAME=$profile_uuid" >> "$GITHUB_ENV"
       - name: Archive and export signed IPA
         run: |
           rm -rf "$ARCHIVE_PATH" "$EXPORT_PATH"
