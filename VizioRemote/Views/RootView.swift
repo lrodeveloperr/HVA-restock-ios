@@ -11,8 +11,11 @@ struct RootView: View {
 
             switch purchases.accessState {
             case .loading:
-                ProgressView("Checking App Store access…")
-                    .tint(.white)
+                if model.device?.isDemo == true {
+                    RemoteView(model: model, purchases: purchases)
+                } else {
+                    ConnectionView(model: model)
+                }
             case .trialActive, .lifetimeUnlocked:
                 if model.hasSavedTV {
                     RemoteView(model: model, purchases: purchases)
@@ -89,7 +92,8 @@ struct RootView: View {
 
     private func reconcileAccess() {
         model.restoreLocalDeviceMetadata()
-        let demoAccess = purchases.accessState == .trialAvailable && model.device?.isDemo == true
+        let demoAccess = (purchases.accessState == .loading || purchases.accessState == .trialAvailable) &&
+            model.device?.isDemo == true
         let enabled = scenePhase == .active && (purchases.hasRemoteAccess || demoAccess)
         model.setRemoteAccessEnabled(enabled)
         if enabled {
