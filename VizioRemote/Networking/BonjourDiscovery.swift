@@ -133,18 +133,19 @@ final class BonjourDiscovery: NSObject, TVDiscovering, @unchecked Sendable {
     private func probe(host: String, name: String) {
         guard probes[host] == nil, devices.values.allSatisfy({ $0.host != host }) else { return }
         let probe = SmartCastPortProbe(host: host) { [weak self] port in
-            DispatchQueue.main.async {
-                guard let self, self.continuation != nil else { return }
-                self.probes[host] = nil
+            guard let discovery = self else { return }
+            DispatchQueue.main.async { [discovery] in
+                guard discovery.continuation != nil else { return }
+                discovery.probes[host] = nil
                 guard let port else { return }
                 let key = "\(host):\(port)"
-                self.devices[key] = TVDevice(
+                discovery.devices[key] = TVDevice(
                     id: "smartcast-\(key)",
                     name: name,
                     host: host,
                     port: port
                 )
-                self.scheduleSettledResult()
+                discovery.scheduleSettledResult()
             }
         }
         probes[host] = probe
