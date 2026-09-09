@@ -147,20 +147,29 @@ jobs:
           fi
           ruby -rjson -rbase64 -rtime -e 'doc=JSON.parse(File.read(ARGV[0])); raw=doc.fetch("data"); data=raw.is_a?(Array) ? raw : [raw]; data.sort_by{|item| Time.parse(item.dig("attributes", "expirationDate"))}.reverse_each.with_index{|item,index| path=File.join(ARGV[1], "candidate-profile-#{index}.mobileprovision"); File.binwrite(path, Base64.decode64(item.fetch("attributes").fetch("profileContent"))); puts path}' "$profile_json" "$RUNNER_TEMP" > "$RUNNER_TEMP/profile-candidates.txt"
           profile_path=""
+          fallback_profile_path=""
           while IFS= read -r candidate; do
             candidate_plist="$candidate.plist"
             security cms -D -i "$candidate" > "$candidate_plist"
             candidate_app_identifier="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$candidate_plist" 2>/dev/null || true)"
             candidate_multicast="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:com.apple.developer.networking.multicast' "$candidate_plist" 2>/dev/null || true)"
+            if [[ "$candidate_app_identifier" == "$APPLE_TEAM_ID.$IOS_BUNDLE_ID" && -z "$fallback_profile_path" ]]; then
+              fallback_profile_path="$candidate"
+              cp "$candidate_plist" "$RUNNER_TEMP/fallback-profile.plist"
+            fi
             if [[ "$candidate_app_identifier" == "$APPLE_TEAM_ID.$IOS_BUNDLE_ID" && "$candidate_multicast" == "true" ]]; then
               profile_path="$candidate"
               cp "$candidate_plist" "$RUNNER_TEMP/profile.plist"
+              echo "HAS_MULTICAST_ENTITLEMENT=true" >> "$GITHUB_ENV"
               break
             fi
           done < "$RUNNER_TEMP/profile-candidates.txt"
           if [[ -z "$profile_path" ]]; then
-            echo "No active provisioning profile matches the app and multicast entitlement." >&2
-            exit 1
+            [[ -n "$fallback_profile_path" ]] || { echo "No active provisioning profile matches this app." >&2; exit 1; }
+            profile_path="$fallback_profile_path"
+            cp "$RUNNER_TEMP/fallback-profile.plist" "$RUNNER_TEMP/profile.plist"
+            echo "HAS_MULTICAST_ENTITLEMENT=false" >> "$GITHUB_ENV"
+            echo "Apple multicast entitlement is still pending; building TestFlight with manual-IP discovery only."
           fi
           profile_uuid="$(/usr/libexec/PlistBuddy -c 'Print :UUID' "$RUNNER_TEMP/profile.plist")"
           app_identifier="$(/usr/libexec/PlistBuddy -c 'Print :Entitlements:application-identifier' "$RUNNER_TEMP/profile.plist")"
@@ -172,7 +181,11 @@ jobs:
         run: |
           rm -rf "$ARCHIVE_PATH" "$EXPORT_PATH"
           mkdir -p "$(dirname "$ARCHIVE_PATH")" "$EXPORT_PATH"
-          xcodebuild -project VizioRemote.xcodeproj -scheme "$SCHEME" -configuration Release -destination 'generic/platform=iOS' -archivePath "$ARCHIVE_PATH" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$IOS_BUNDLE_ID" CODE_SIGN_STYLE=Manual PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" CODE_SIGN_IDENTITY="Apple Distribution" OTHER_CODE_SIGN_FLAGS="--keychain $SIGNING_KEYCHAIN" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" clean archive
+          entitlement_args=()
+          if [[ "$HAS_MULTICAST_ENTITLEMENT" != "true" ]]; then
+            entitlement_args+=(CODE_SIGN_ENTITLEMENTS=)
+          fi
+          xcodebuild -project VizioRemote.xcodeproj -scheme "$SCHEME" -configuration Release -destination 'generic/platform=iOS' -archivePath "$ARCHIVE_PATH" DEVELOPMENT_TEAM="$APPLE_TEAM_ID" PRODUCT_BUNDLE_IDENTIFIER="$IOS_BUNDLE_ID" CODE_SIGN_STYLE=Manual PROVISIONING_PROFILE_SPECIFIER="$PROVISIONING_PROFILE_NAME" CODE_SIGN_IDENTITY="Apple Distribution" OTHER_CODE_SIGN_FLAGS="--keychain $SIGNING_KEYCHAIN" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" "${entitlement_args[@]}" clean archive
           export_options="$RUNNER_TEMP/ExportOptions.plist"
           plutil -create xml1 "$export_options"
           /usr/libexec/PlistBuddy -c 'Add :method string app-store-connect' "$export_options"
@@ -208,8 +221,12 @@ jobs:
           codesign -d --entitlements :- "$app" > "$inspection/signed-entitlements.plist"
           plutil -lint "$inspection/signed-entitlements.plist" "$inspection/PrivacyInfo.xcprivacy"
           signed_multicast="$(/usr/libexec/PlistBuddy -c 'Print :com.apple.developer.networking.multicast' "$inspection/signed-entitlements.plist" 2>/dev/null || true)"
-          if [[ "$signed_multicast" != "true" ]]; then
+          if [[ "$HAS_MULTICAST_ENTITLEMENT" == "true" && "$signed_multicast" != "true" ]]; then
             echo "Signed app is missing multicast entitlement." >&2
+            exit 1
+          fi
+          if [[ "$HAS_MULTICAST_ENTITLEMENT" != "true" && -n "$signed_multicast" ]]; then
+            echo "Signed app unexpectedly contains multicast entitlement." >&2
             exit 1
           fi
           [[ "$(plutil -extract NSPrivacyTracking raw -o - "$inspection/PrivacyInfo.xcprivacy")" == "false" ]]
